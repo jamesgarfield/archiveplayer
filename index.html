@@ -10,7 +10,7 @@
 
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
-			<%= data.creator %> - <%= data.title %>
+			<a href="#" class="songmetainfo"><%= data.creator %> - <%= data.title %></a>
 			<audio controls="controls" preload="none">
 				<%= data.streams %>
 			</audio>
@@ -22,14 +22,66 @@
 	</script>
 
 	<script type="text/javascript">
-	(function ($){
+	var audioPlayer = new function() {
 		
+		var self = this;
+		var $ = jQuery;
+
+		var currentSong = null;
+
+
+		var attachPlaylistEvents = function() {
+			var playlist = document.getElementsByTagName("audio");
+			for (var i = 0; i < playlist.length-1; i++)
+			{
+				var audio = playlist[i];
+				audio.addEventListener("ended", makePlayer(playlist[i+1]));
+			}
+		}
+
 		var makePlayer = function (song) {
 			return function () {
 				song.play();
 			}
 		}
-		
+
+		var getTemplate = function (name) {
+			return _.template($("#"+name).html());
+		}
+
+		var renderSet = function (set, name){
+			var template = getTemplate(name);
+			var rendered = _(set).map(template);
+			return rendered.join('\n');
+		}
+
+		self.loadPlaylist = function (playlist) {
+			var container = $("#playlistContainer");
+			if (playlist.length) {
+				_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
+				self.container.html(renderSet(playlist, "tplPlaylistRecord"));
+				attachPlaylistEvents();	
+			}
+			else
+			{
+				container.html("Contains no streamable content");
+			}
+			
+		}
+
+		self.setContainer = function (container) {
+			self.container = container;
+		}
+	};
+
+
+	var archiveLoader = new function () {
+		var self = this;
+		var $ = jQuery;
+
+
+		self.searchBoxID = null;
+
 		var propertyIs = function (name, value) {
 			if (value instanceof Array)
 			{
@@ -81,7 +133,7 @@
 						}
 					}
 
-					var audioModel = _.chain(files)
+					var playlist = _.chain(files)
 						.filter(isOriginal)
 						.map(function (obj) { obj.streams = _(files).filter(streamables(obj)); return obj; })
 						.filter(function (obj) { return obj.streams.length > 0 } )
@@ -89,48 +141,14 @@
 
 					$("#showTitle").html((data.metadata.title && data.metadata.title[0]) || "No Title");
 					$("#showTaper").html("Taper: " + (data.metadata.taper && data.metadata.taper[0]) || "None");
-					showPlaylist(audioModel);
+					audioPlayer.loadPlaylist(playlist);
 				},
 			});	
 		}
 
-		var getTemplate = function (name) {
-			return _.template($("#"+name).html());
-		}
-
-		var renderSet = function (set, name){
-			var template = getTemplate(name);
-			var rendered = _(set).map(template);
-			return rendered.join('\n');
-		}
-
-		var showPlaylist = function (audioModel) {
-			var container = $("#playlistContainer");
-			if (audioModel.length) {
-				_(audioModel).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
-				container.html(renderSet(audioModel, "tplPlaylistRecord"));
-				attachPlaylistEvents();	
-			}
-			else
-			{
-				container.html("Contains no streamable content");
-			}
-			
-		}
-
-		
-		var attachPlaylistEvents = function() {
-			var playlist = document.getElementsByTagName("audio");
-			for (var i = 0; i < playlist.length-1; i++)
-			{
-				var audio = playlist[i];
-				audio.addEventListener("ended", makePlayer(playlist[i+1]));
-			}
-		}
-
-		var selectShow = function (artist, showNumber) {
+		var randomShow = function (query, showNumber) {
 			var page = (showNumber == null) ? 1 : showNumber + 1;
-			var searchURL = "http://archive.org/advancedsearch.php?q=collection:" + artist + "&fl[]=identifier&rows=1&page=" + page + "&output=json"
+			var searchURL = "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + page + "&output=json"
 			$.ajax({
 				url : searchURL, 
 				dataType : 'jsonp', 
@@ -145,39 +163,41 @@
 					else
 					{
 						showNumber = _.random(data.response.numFound);
-						selectShow(artist, showNumber);
+						randomShow(query, showNumber);
 					}
 
 				},
 			});
 		}
 
-		var setCollections = function () {
+		self.randomShowByCollection = function(collection) {
+			var query = "collection:" + collection;
+			randomShow(query);
+		}
+
+		
+		self.initSearchBox = function (searchBoxID) {
 			$.ajax({
 				url : "http://archive.org/advancedsearch.php?q=mediatype%3Acollection+AND+collection%3Aetree&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=6000&page=1&output=json", 
 				dataType : 'jsonp', 
 				success : function (data, status) {
 					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
 
-					$("#artistName").autocomplete({source:collections});
+					$("#" + searchBoxID).autocomplete({source:collections});
 
 				},
 			});
 		}
+	};
 
-		var readCollection = function () {
-			var collection = $("#artistName").val();
-			return collection;
-
-		}
-
-
+	(function ($){
 		$(document).ready(function (){
 			_.templateSettings.variable = "data";
-			//loadShow("http://archive.org/details/Lotus2007-10-11.GreatAmericanMusicHallSanFrancisco&output=json");
-			//loadShow("http://archive.org/details/moe2002-04-21dnk.shnf&output=json");
-			$("#randomShow").click(function () {selectShow(readCollection())});
-			setCollections();
+
+			audioPlayer.setContainer($("#playlistContainer"));
+			archiveLoader.initSearchBox("searchBox");
+			
+			$("#generatePlaylist").click(function () { archiveLoader.randomShowByCollection($("#searchBox").val()); });
 		})
 	})(jQuery);
 	
@@ -186,7 +206,7 @@
 </head>
 
 <body>
-	<input type="text" id="artistName"/><a href="#" id="randomShow">Click Me</a>
+	<input type="text" id="searchBox"/><a href="#" id="generatePlaylist">Click Me</a>
 	<h1 id="showTitle"></h1>
 	<h2 id="showTaper"></h2>
 	<ul id="playlistContainer">
