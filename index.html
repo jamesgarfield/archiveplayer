@@ -6,7 +6,8 @@
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
-
+	<script type="text/javascript" src="https://raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
+	
 
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
@@ -31,18 +32,48 @@
 
 
 		var attachPlaylistEvents = function() {
-			var playlist = document.getElementsByTagName("audio");
+			var playlist = getAudioSet();
+			var meta = $.makeArray($(self.containerID + " .songmetainfo"));
 			for (var i = 0; i < playlist.length-1; i++)
 			{
-				var audio = playlist[i];
-				audio.addEventListener("ended", makePlayer(playlist[i+1]));
+				var currentSong = playlist[i];
+				var nextSong = playlist[i+1];
+
+				var currentMeta = meta[i];
+
+				currentSong.addEventListener("play", makePlayEvent(currentSong, nextSong))
+				currentMeta.addEventListener("click", makePlayer(currentSong));
+				currentSong.addEventListener("ended", makeEndEvent(nextSong));
+				
+			}
+		}
+
+		var makeEndEvent = function (song) {
+			return function () {
+				self.currentSong = null;
+				song.play();
+			}
+		}
+
+		var makePlayEvent = function (song, nextSong) {
+			return function () {
+				if (self.currentSong) {
+					self.currentSong.pause();
+					self.currentSong.currentTime = 0;
+				}
+				self.currentSong = song;
+				nextSong.load(); //buffer next file
 			}
 		}
 
 		var makePlayer = function (song) {
-			return function () {
-				song.play();
-			}
+			return function () { song.play(); }
+		}
+
+
+
+		var getAudioSet = function () {
+			return $.makeArray($(self.containerID + " audio"));
 		}
 
 		var getTemplate = function (name) {
@@ -55,11 +86,15 @@
 			return rendered.join('\n');
 		}
 
+		self.setContainer = function (containerID) {
+			self.containerID = "#" + containerID;
+		}
+
 		self.loadPlaylist = function (playlist) {
-			var container = $("#playlistContainer");
+			var container = $(self.containerID);
 			if (playlist.length) {
 				_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
-				self.container.html(renderSet(playlist, "tplPlaylistRecord"));
+				container.html(renderSet(playlist, "tplPlaylistRecord"));
 				attachPlaylistEvents();	
 			}
 			else
@@ -69,9 +104,12 @@
 			
 		}
 
-		self.setContainer = function (container) {
-			self.container = container;
+		var playFirst = function () {
+			var playlist = getAudioSet();
+			playlist[0].play();
 		}
+
+		self.play = playFirst;
 	};
 
 
@@ -175,7 +213,6 @@
 			randomShow(query);
 		}
 
-		
 		self.initSearchBox = function (searchBoxID) {
 			$.ajax({
 				url : "http://archive.org/advancedsearch.php?q=mediatype%3Acollection+AND+collection%3Aetree&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=6000&page=1&output=json", 
@@ -194,7 +231,7 @@
 		$(document).ready(function (){
 			_.templateSettings.variable = "data";
 
-			audioPlayer.setContainer($("#playlistContainer"));
+			audioPlayer.setContainer("playlistContainer");
 			archiveLoader.initSearchBox("searchBox");
 			
 			$("#generatePlaylist").click(function () { archiveLoader.randomShowByCollection($("#searchBox").val()); });
