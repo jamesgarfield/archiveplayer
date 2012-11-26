@@ -46,6 +46,7 @@
 				currentSong.addEventListener("ended", makeEndEvent(nextSong));
 				
 			}
+
 		}
 
 		var makeEndEvent = function (song) {
@@ -62,7 +63,7 @@
 					self.currentSong.currentTime = 0;
 				}
 				self.currentSong = song;
-				nextSong.load(); //buffer next file
+				//nextSong.load(); //buffer next file
 			}
 		}
 
@@ -95,6 +96,7 @@
 			if (playlist.length) {
 				_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
 				container.html(renderSet(playlist, "tplPlaylistRecord"));
+				getAudioSet()[0].load();
 				attachPlaylistEvents();	
 			}
 			else
