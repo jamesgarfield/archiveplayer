@@ -120,6 +120,8 @@
 				self.currentSong.pause() });
 			$("#apCtrlStop").click(function (){ 
 				self.currentSong.pause(); self.currentSong.currentTime = 0; });
+			$("#apCtrlNext").click(function (){ 
+				self.currentSong.currentTime = self.currentSong.duration; });
 			$("#apCtrlVolume").slider({
 				min : 0,
 				max : 100,
