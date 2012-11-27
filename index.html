@@ -13,7 +13,7 @@
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
 			<a href="#" class="songmetainfo"><%= data.creator %> - <%= data.title %></a>
-			<audio controls="controls" preload="none">
+			<audio controls="controls" preload="meta">
 				<%= data.streams %>
 			</audio>
 		</li>
@@ -31,8 +31,8 @@
 
 		var currentSong = null;
 
-
 		var attachPlaylistEvents = function() {
+
 			var playlist = getAudioSet();
 			var meta = $.makeArray($(self.containerID + " .songmetainfo"));
 			for (var i = 0; i < playlist.length-1; i++)
@@ -45,7 +45,7 @@
 				currentSong.addEventListener("play", makePlayEvent(currentSong, nextSong))
 				currentMeta.addEventListener("click", makePlayer(currentSong));
 				currentSong.addEventListener("ended", makeEndEvent(nextSong));
-				
+				currentSong.addEventListener("timeupdate", makeTimeUpdater(currentSong, nextSong))		
 			}
 
 		}
@@ -59,11 +59,13 @@
 
 		var makePlayEvent = function (song, nextSong) {
 			return function () {
-				if (self.currentSong) {
+				if (self.currentSong && self.currentSong != song) {
 					self.currentSong.pause();
 					self.currentSong.currentTime = 0;
 				}
 				self.currentSong = song;
+				$("#trackDescription").html(song.parentNode.children[0].innerText);
+				$("#trackLength").html(getTimeSigniture(song.duration));
 				//nextSong.load(); //buffer next file
 			}
 		}
@@ -72,6 +74,27 @@
 			return function () { song.play(); }
 		}
 
+		var makeTimeUpdater = function (song, nextSong) {
+			var loading = false;
+			return function () {
+				$("#trackTime").html(getTimeSigniture(self.currentSong.currentTime)); 
+				$("#trackLength").html(getTimeSigniture(song.duration));
+				if (!loading && song.duration - song.currentTime < 5) {
+					nextSong.load();
+				}
+			}
+		}
+
+
+		var padder = function (num, padding) {
+			return (new Array(padding-(num+'').length + 1)).join('0') + num;
+		}
+
+		var getTimeSigniture = function (seconds) {
+			var min = padder(parseInt(Math.floor(seconds/60), 10) || 0, 2);
+			var sec = padder(parseInt(seconds - (min * 60), 10) || 0, 2);
+			return [min, sec].join(":");
+		}
 
 
 		var getAudioSet = function () {
@@ -90,6 +113,12 @@
 
 		self.setContainer = function (containerID) {
 			self.containerID = "#" + containerID;
+			$("#apCtrlPlay").click(function (){ 
+				self.currentSong.play() });
+			$("#apCtrlPause").click(function (){ 
+				self.currentSong.pause() });
+			$("#apCtrlStop").click(function (){ 
+				self.currentSong.pause(); self.currentSong.currentTime = 0; });
 		}
 
 		self.loadPlaylist = function (playlist) {
@@ -97,7 +126,9 @@
 			if (playlist.length) {
 				_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
 				container.html(renderSet(playlist, "tplPlaylistRecord"));
-				getAudioSet()[0].load();
+				var firstSong = getAudioSet()[0];
+				firstSong.load();
+				self.currentSong = firstSong;
 				attachPlaylistEvents();	
 			}
 			else
@@ -249,14 +280,19 @@
 	<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="/images/magnifying_glass_24x24.png" alt="Search"/></a>
 	<h1 id="showTitle"></h1>
 	<h2 id="showTaper"></h2>
-	<ul>
-		<li><img src="/images/first_16x16.png"/></li>
-		<li><img src="/images/play_12x16.png"/></li>
-		<li><img src="/images/pause_12x16.png"/></li>
-		<li><img src="/images/stop_16x16.png"/></li>
-		<li><img src="/images/last_16x16.png"/></li>
+	<ul class="audiocontroller" id="audiocontroller">
+		<li class="audiocontrol"><img src="/images/first_16x16.png" id="apCtrlBack"/></li>
+		<li class="audiocontrol"><img src="/images/play_12x16.png"  id="apCtrlPlay"></li>
+		<li class="audiocontrol"><img src="/images/pause_12x16.png" id="apCtrlPause"></li>
+		<li class="audiocontrol"><img src="/images/stop_16x16.png"  id="apCtrlStop"></li>
+		<li class="audiocontrol"><img src="/images/last_16x16.png"  id="apCtrlNext"/></li>
 	</ul>
-	<ul id="playlistContainer">
+	<ul class="audioinfo">
+		<li class="time" id="trackTime"></li>
+		<li class="description" id="trackDescription"></li>
+		<li class="time" id="trackLength"></li>
+	</ul>
+	<ul class="playlist" id="playlistContainer">
 	</ul>
 </body>
 </html>
