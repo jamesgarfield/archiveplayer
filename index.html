@@ -135,11 +135,15 @@
 				min : 0,
 				max : 100,
 				value : 0,
+				range: "min",
 				change : function (event, ui) {
-					var newTime = self.currentSong.duration * (ui.value/100);
-					var delta = Math.abs(self.currentSong.currentTime - newTime)
-					if (delta > 5) {
-						self.currentSong.currentTime = newTime;	
+					var song = self.currentSong;
+					if (song && event.originalEvent) {
+						var newTime = song.duration * (ui.value/100);
+						var delta = Math.abs(song.currentTime - newTime)
+						if (delta > 5) {
+							song.currentTime = newTime;	
+						}	
 					}
 				}
 			});
