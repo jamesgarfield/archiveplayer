@@ -13,7 +13,7 @@
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
 			<a href="#" class="songmetainfo"><%= data.creator %> - <%= data.title %></a>
-			<audio controls="controls" preload="meta">
+			<audio controls="controls" preload="meta" crossorigin="anonymous">
 				<%= data.streams %>
 			</audio>
 		</li>
