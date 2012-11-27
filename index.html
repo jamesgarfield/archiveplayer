@@ -65,6 +65,7 @@
 					self.currentSong.pause();
 					self.currentSong.currentTime = 0;
 				}
+				$("#apCtrlProgress").slider("option", "value", 0)
 				self.currentSong = song;
 				$("#trackDescription").html(song.parentNode.children[0].innerText);
 				$("#trackLength").html(getTimeSigniture(song.duration));
@@ -84,6 +85,7 @@
 				if (!loading && song.duration - song.currentTime < 5) {
 					nextSong.load();
 				}
+				$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
 			}
 		}
 
@@ -128,6 +130,18 @@
 				max : 100,
 				value : 100,
 				change : function (event, ui) { self.currentSong.volume = (ui.value/100)  }
+			});
+			$("#apCtrlProgress").slider({
+				min : 0,
+				max : 100,
+				value : 0,
+				change : function (event, ui) {
+					var newTime = self.currentSong.duration * (ui.value/100);
+					var delta = Math.abs(self.currentSong.currentTime - newTime)
+					if (delta > 5) {
+						self.currentSong.currentTime = newTime;	
+					}
+				}
 			});
 		}
 
@@ -289,11 +303,12 @@
 		<li class="audiocontrol"><img src="/images/pause_12x16.png" id="apCtrlPause"></li>
 		<li class="audiocontrol"><img src="/images/stop_16x16.png"  id="apCtrlStop"></li>
 		<li class="audiocontrol"><img src="/images/last_16x16.png"  id="apCtrlNext"/></li>
-		<li class="audiocontrol"><div class="volume" id="apCtrlVolume"></div>
+		<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
 	</ul>
 	<ul class="audioinfo">
-		<li class="time" id="trackTime"></li>
 		<li class="description" id="trackDescription"></li>
+		<li class="time" id="trackTime"></li>
+		<li class="trackPosition" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
 		<li class="time" id="trackLength"></li>
 	</ul>
 	<ul class="playlist" id="playlistContainer">

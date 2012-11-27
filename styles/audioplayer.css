@@ -1,5 +1,15 @@
-.volume {
+.apVolume {
 	height : 5px;
 	width : 50px;
 	font-size: 50%;
+}
+
+.apProgress {
+	height : 5px;
+	width : 100px;
+	font-size: 1%;
+}
+
+.apProgress .ui-slider-range {
+	background: #E0E1DD;
 }
