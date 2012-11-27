@@ -43,17 +43,18 @@
 				var currentMeta = meta[i];
 
 				currentSong.addEventListener("play", makePlayEvent(currentSong, nextSong))
-				currentMeta.addEventListener("click", makePlayer(currentSong));
-				currentSong.addEventListener("ended", makeEndEvent(nextSong));
+				currentMeta.addEventListener("click", makePlayer(currentSong, nextSong));
+				currentSong.addEventListener("ended", makeEndEvent(currentSong, nextSong));
 				currentSong.addEventListener("timeupdate", makeTimeUpdater(currentSong, nextSong))		
 			}
 
 		}
 
-		var makeEndEvent = function (song) {
+		var makeEndEvent = function (song, nextSong) {
 			return function () {
 				self.currentSong = null;
-				song.play();
+				nextSong.play();
+				nextSong.volume = song.volume;
 			}
 		}
 
@@ -119,6 +120,12 @@
 				self.currentSong.pause() });
 			$("#apCtrlStop").click(function (){ 
 				self.currentSong.pause(); self.currentSong.currentTime = 0; });
+			$("#apCtrlVolume").slider({
+				min : 0,
+				max : 100,
+				value : 100,
+				change : function (event, ui) { self.currentSong.volume = (ui.value/100)  }
+			});
 		}
 
 		self.loadPlaylist = function (playlist) {
@@ -137,13 +144,6 @@
 			}
 			
 		}
-
-		var playFirst = function () {
-			var playlist = getAudioSet();
-			playlist[0].play();
-		}
-
-		self.play = playFirst;
 	};
 
 
@@ -286,6 +286,7 @@
 		<li class="audiocontrol"><img src="/images/pause_12x16.png" id="apCtrlPause"></li>
 		<li class="audiocontrol"><img src="/images/stop_16x16.png"  id="apCtrlStop"></li>
 		<li class="audiocontrol"><img src="/images/last_16x16.png"  id="apCtrlNext"/></li>
+		<li class="audiocontrol"><div id="apCtrlVolume"></div>
 	</ul>
 	<ul class="audioinfo">
 		<li class="time" id="trackTime"></li>
