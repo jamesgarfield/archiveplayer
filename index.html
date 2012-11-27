@@ -4,6 +4,7 @@
 <head>
 	<link rel="stylesheet" href="/styles/meyerreset.css"/>
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"/>
+	<link rel="stylesheet" href="/styles/audioplayer.css"/>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
@@ -13,7 +14,7 @@
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
 			<a href="#" class="songmetainfo"><%= data.creator %> - <%= data.title %></a>
-			<audio controls="controls" preload="meta">
+			<audio preload="meta">
 				<%= data.streams %>
 			</audio>
 		</li>
@@ -288,7 +289,7 @@
 		<li class="audiocontrol"><img src="/images/pause_12x16.png" id="apCtrlPause"></li>
 		<li class="audiocontrol"><img src="/images/stop_16x16.png"  id="apCtrlStop"></li>
 		<li class="audiocontrol"><img src="/images/last_16x16.png"  id="apCtrlNext"/></li>
-		<li class="audiocontrol"><div id="apCtrlVolume"></div>
+		<li class="audiocontrol"><div class="volume" id="apCtrlVolume"></div>
 	</ul>
 	<ul class="audioinfo">
 		<li class="time" id="trackTime"></li>
