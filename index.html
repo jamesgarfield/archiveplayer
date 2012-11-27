@@ -83,6 +83,7 @@
 				$("#trackTime").html(getTimeSigniture(self.currentSong.currentTime)); 
 				$("#trackLength").html(getTimeSigniture(song.duration));
 				if (!loading && song.duration - song.currentTime < 5) {
+					loading = true;
 					nextSong.load();
 				}
 				$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
