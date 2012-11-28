@@ -3,6 +3,10 @@ var audioPlayer = new function() {
 	var self = this;
 	var $ = jQuery;
 
+	var idiot = function (value) {
+		return function () { return value; }
+	}
+
 	var attachPlaylistEvents = function() {
 
 		var playlist = getAudioSet();
@@ -22,18 +26,24 @@ var audioPlayer = new function() {
 
 	}
 
+
+
 	var makeEndEvent = function (song, nextSong) {
 		return function () {
+			self.getCurrentTrack = idiot(nextSong);
 			self.play = makePlayer(nextSong);
-			nextSong.play();
+			self.back = makePlayer(song);
+			self.play();
 		}
 	}
 
 	var makePlayEvent = function (song, nextSong) {
 		return function () {
+			self.next = makePlayer(nextSong);
 			_.chain(getAudioSet())
 				.filter(function (track) { return track != song })
 				.map(stopTrack);
+
 		}
 	}
 
@@ -50,7 +60,7 @@ var audioPlayer = new function() {
 	var makeTimeUpdater = function (song, nextSong) {
 		var loading = false;
 		return function () {
-			$("#trackTime").html(getTimeSigniture(song)); 
+			$("#trackTime").html(getTimeSigniture(song.currentTime)); 
 			$("#trackLength").html(getTimeSigniture(song.duration));
 			if (!loading && song.duration - song.currentTime < 5) {
 				loading = true;
@@ -88,13 +98,10 @@ var audioPlayer = new function() {
 
 	self.setContainer = function (containerID) {
 		self.containerID = "#" + containerID;
-		$("#apCtrlPlay").click(function (){ 
-			self.currentSong.play() });
-		$("#apCtrlPause").click(function (){ 
-			self.currentSong.pause() });
-		$("#apCtrlStop").click(self.stop);
-		$("#apCtrlNext").click(function (){ 
-			self.currentSong.currentTime = self.currentSong.duration; });
+		$("#apCtrlPlay").click( function () { self.play();  });
+		$("#apCtrlPause").click(function () { self.pause(); });
+		$("#apCtrlStop").click( function () { self.stop();  });
+		$("#apCtrlNext").click( function () { self.next();  });
 		$("#apCtrlVolume").slider({
 			min : 0,
 			max : 100,
@@ -107,7 +114,7 @@ var audioPlayer = new function() {
 			value : 0,
 			range: "min",
 			change : function (event, ui) {
-				var song = self.currentSong;
+				var song = self.getCurrentTrack();
 				if (song && event.originalEvent) {
 					var newTime = song.duration * (ui.value/100);
 					var delta = Math.abs(song.currentTime - newTime)
@@ -127,7 +134,9 @@ var audioPlayer = new function() {
 			var audioSet = getAudioSet();
 			var firstSong = audioSet[0];
 			var nextSong = audioSet[1];
-			self.play = makePlayer(firstSong, nextSong);
+			self.play = makePlayer(firstSong);
+			self.next = makePlayer(nextSong);
+			self.getCurrentTrack = idiot(firstSong);
 			firstSong.load();
 			attachPlaylistEvents();	
 		}
@@ -151,7 +160,7 @@ var audioPlayer = new function() {
 		return track;
 	}
 
-	var pauseTrack  = function (track) {
+	var pauseTrack = function (track) {
 		try {
 			track.pause();
 			track.currentTime = 0;	
@@ -173,4 +182,10 @@ var audioPlayer = new function() {
 	}
 
 	self.play = function () {};
+
+	self.next = function () {};
+
+	self.back = function () {};
+
+	self.getCurrentTrack = function () {};
 };
