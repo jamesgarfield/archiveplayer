@@ -48,24 +48,28 @@
 </head>
 
 <body>
-	<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="audioplayer/images/magnifying_glass_24x24.png" alt="Search"/></a>
-	<h1 id="showTitle"></h1>
-	<h2 id="showTaper"></h2>
-	<ul class="audiocontroller" id="audiocontroller">
-		<li class="audiocontrol"><img src="audioplayer/images/first_16x16.png" id="apCtrlBack"/></li>
-		<li class="audiocontrol"><img src="audioplayer/images/play_12x16.png"  id="apCtrlPlay"></li>
-		<li class="audiocontrol"><img src="audioplayer/images/pause_12x16.png" id="apCtrlPause"></li>
-		<li class="audiocontrol"><img src="audioplayer/images/stop_16x16.png"  id="apCtrlStop"></li>
-		<li class="audiocontrol"><img src="audioplayer/images/last_16x16.png"  id="apCtrlNext"/></li>
-		<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
-	</ul>
-	<ul class="audioinfo">
-		<li class="description" id="trackDescription"></li>
-		<li class="time" id="trackTime"></li>
-		<li class="trackPosition" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
-		<li class="time" id="trackLength"></li>
-	</ul>
-	<ul class="playlist" id="playlistContainer">
-	</ul>
+	<div class="metapane" id="metapane">
+		Select Artist:<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="audioplayer/images/magnifying_glass_24x24.png" alt="Search"/>Search</a>
+		<h1 id="showTitle"></h1>
+		<h2 id="showTaper"></h2>
+	</div>
+	<div id="audiopane">
+		<h3 class="description" id="trackDescription">No Media Loaded</h3>
+		<ul class="audioinfo">
+			<li class="time" id="trackTime">00:00</li>
+			<li class="trackPosition" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
+			<li class="time" id="trackLength">&infin;</li>
+		</ul>
+		<ul class="audiocontroller" id="audiocontroller">
+			<li class="audiocontrol"><img src="audioplayer/images/first_16x16.png" id="apCtrlBack"/></li>
+			<li class="audiocontrol"><img src="audioplayer/images/play_12x16.png"  id="apCtrlPlay"></li>
+			<li class="audiocontrol"><img src="audioplayer/images/pause_12x16.png" id="apCtrlPause"></li>
+			<li class="audiocontrol"><img src="audioplayer/images/stop_16x16.png"  id="apCtrlStop"></li>
+			<li class="audiocontrol"><img src="audioplayer/images/last_16x16.png"  id="apCtrlNext"/></li>
+			<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
+		</ul>
+		<ul class="playlist" id="playlistContainer">
+		</ul>
+	</div>
 </body>
 </html>
