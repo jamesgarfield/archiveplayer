@@ -3,8 +3,6 @@ var audioPlayer = new function() {
 	var self = this;
 	var $ = jQuery;
 
-	var currentSong = null;
-
 	var attachPlaylistEvents = function() {
 
 		var playlist = getAudioSet();
@@ -16,8 +14,8 @@ var audioPlayer = new function() {
 
 			var currentMeta = meta[i];
 
+			currentMeta.addEventListener("click", makePlayer(currentSong));
 			currentSong.addEventListener("play", makePlayEvent(currentSong, nextSong))
-			currentMeta.addEventListener("click", makePlayer(currentSong, nextSong));
 			currentSong.addEventListener("ended", makeEndEvent(currentSong, nextSong));
 			currentSong.addEventListener("timeupdate", makeTimeUpdater(currentSong, nextSong))		
 		}
@@ -26,34 +24,33 @@ var audioPlayer = new function() {
 
 	var makeEndEvent = function (song, nextSong) {
 		return function () {
-			self.currentSong = null;
+			self.play = makePlayer(nextSong);
 			nextSong.play();
-			nextSong.volume = song.volume;
 		}
 	}
 
 	var makePlayEvent = function (song, nextSong) {
 		return function () {
-			if (self.currentSong && self.currentSong != song) {
-				self.currentSong.pause();
-				self.currentSong.currentTime = 0;
-			}
-			$("#apCtrlProgress").slider("option", "value", 0)
-			self.currentSong = song;
-			$("#trackDescription").html(song.parentNode.children[0].innerText);
-			$("#trackLength").html(getTimeSigniture(song.duration));
-			//nextSong.load(); //buffer next file
+			_.chain(getAudioSet())
+				.filter(function (track) { return track != song })
+				.map(stopTrack);
 		}
 	}
 
 	var makePlayer = function (song) {
-		return function () { song.play(); }
+		return function () { 
+			song.load();
+			$("#apCtrlProgress").slider("option", "value", 0)
+			$("#trackDescription").html(song.parentNode.children[0].innerText);
+			$("#trackLength").html(getTimeSigniture(song.duration));
+			song.play();
+		}
 	}
 
 	var makeTimeUpdater = function (song, nextSong) {
 		var loading = false;
 		return function () {
-			$("#trackTime").html(getTimeSigniture(self.currentSong.currentTime)); 
+			$("#trackTime").html(getTimeSigniture(song)); 
 			$("#trackLength").html(getTimeSigniture(song.duration));
 			if (!loading && song.duration - song.currentTime < 5) {
 				loading = true;
@@ -95,15 +92,14 @@ var audioPlayer = new function() {
 			self.currentSong.play() });
 		$("#apCtrlPause").click(function (){ 
 			self.currentSong.pause() });
-		$("#apCtrlStop").click(function (){ 
-			self.currentSong.pause(); self.currentSong.currentTime = 0; });
+		$("#apCtrlStop").click(self.stop);
 		$("#apCtrlNext").click(function (){ 
 			self.currentSong.currentTime = self.currentSong.duration; });
 		$("#apCtrlVolume").slider({
 			min : 0,
 			max : 100,
 			value : 100,
-			change : function (event, ui) { self.currentSong.volume = (ui.value/100)  }
+			change : function (event, ui) { _(getAudioSet()).each(function (track) {track.volume = (ui.value/100)})  }
 		});
 		$("#apCtrlProgress").slider({
 			min : 0,
@@ -128,9 +124,11 @@ var audioPlayer = new function() {
 		if (playlist.length) {
 			_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
 			container.html(renderSet(playlist, "tplPlaylistRecord"));
-			var firstSong = getAudioSet()[0];
+			var audioSet = getAudioSet();
+			var firstSong = audioSet[0];
+			var nextSong = audioSet[1];
+			self.play = makePlayer(firstSong, nextSong);
 			firstSong.load();
-			self.currentSong = firstSong;
 			attachPlaylistEvents();	
 		}
 		else
@@ -139,4 +137,40 @@ var audioPlayer = new function() {
 		}
 		
 	}
+
+	var stopTrack = function (track) { 
+		try {
+			track.pause();
+			track.currentTime = 0;	
+		}
+		catch (e)
+		{
+			//Perhaps deals with INVALID_STATE_ERR DOM Exception 11
+		}
+		
+		return track;
+	}
+
+	var pauseTrack  = function (track) {
+		try {
+			track.pause();
+			track.currentTime = 0;	
+		}
+		catch (e)
+		{
+			//Perhaps deals with INVALID_STATE_ERR DOM Exception 11
+		}
+		
+		return track;	
+	}
+
+	self.pause = function () {
+		_(getAudioSet()).each(pauseTrack);
+	}
+
+	self.stop = function () {
+		_(getAudioSet()).each(stopTrack);
+	}
+
+	self.play = function () {};
 };
