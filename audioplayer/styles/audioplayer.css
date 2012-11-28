@@ -1,0 +1,31 @@
+.apVolume {
+	height : 5px;
+	width : 50px;
+	font-size: 20%;
+}
+
+.apProgress {
+	height : 5px;
+	width : 100px;
+	font-size: 1%;
+}
+
+.apProgress .ui-slider-range {
+	background: #E0E1DD;
+}
+
+.audiocontroller li {
+	display: inline;
+}
+
+.audiocontroller div {
+	display: inline-block;
+}
+
+.audioinfo li {
+	display: inline;
+}
+
+.audioinfo div {
+	display: inline-block;
+}

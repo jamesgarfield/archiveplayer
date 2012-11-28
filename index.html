@@ -2,14 +2,16 @@
 <html>
 
 <head>
-	<link rel="stylesheet" href="/styles/meyerreset.css"/>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"/>
-	<link rel="stylesheet" href="/styles/audioplayer.css"/>
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
-	<script type="text/javascript" src="https://raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
+	<link rel="stylesheet" href="styles/meyerreset.css"/>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"/>
+	<link rel="stylesheet" href="audioplayer/styles/audioplayer.css"/>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
+	<script type="text/javascript" src="//raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
 	
+	<script type="text/javascript" src="audioplayer/audioplayer.js"></script>
+	<script type="text/javascript" src="archiveloader/archiveloader.js"></script>
 
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
@@ -25,263 +27,10 @@
 	</script>
 
 	<script type="text/javascript">
-	var audioPlayer = new function() {
-		
-		var self = this;
-		var $ = jQuery;
-
-		var currentSong = null;
-
-		var attachPlaylistEvents = function() {
-
-			var playlist = getAudioSet();
-			var meta = $.makeArray($(self.containerID + " .songmetainfo"));
-			for (var i = 0; i < playlist.length-1; i++)
-			{
-				var currentSong = playlist[i];
-				var nextSong = playlist[i+1];
-
-				var currentMeta = meta[i];
-
-				currentSong.addEventListener("play", makePlayEvent(currentSong, nextSong))
-				currentMeta.addEventListener("click", makePlayer(currentSong, nextSong));
-				currentSong.addEventListener("ended", makeEndEvent(currentSong, nextSong));
-				currentSong.addEventListener("timeupdate", makeTimeUpdater(currentSong, nextSong))		
-			}
-
-		}
-
-		var makeEndEvent = function (song, nextSong) {
-			return function () {
-				self.currentSong = null;
-				nextSong.play();
-				nextSong.volume = song.volume;
-			}
-		}
-
-		var makePlayEvent = function (song, nextSong) {
-			return function () {
-				if (self.currentSong && self.currentSong != song) {
-					self.currentSong.pause();
-					self.currentSong.currentTime = 0;
-				}
-				$("#apCtrlProgress").slider("option", "value", 0)
-				self.currentSong = song;
-				$("#trackDescription").html(song.parentNode.children[0].innerText);
-				$("#trackLength").html(getTimeSigniture(song.duration));
-				//nextSong.load(); //buffer next file
-			}
-		}
-
-		var makePlayer = function (song) {
-			return function () { song.play(); }
-		}
-
-		var makeTimeUpdater = function (song, nextSong) {
-			var loading = false;
-			return function () {
-				$("#trackTime").html(getTimeSigniture(self.currentSong.currentTime)); 
-				$("#trackLength").html(getTimeSigniture(song.duration));
-				if (!loading && song.duration - song.currentTime < 5) {
-					loading = true;
-					nextSong.load();
-				}
-				$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
-			}
-		}
+	
 
 
-		var padder = function (num, padding) {
-			return (new Array(padding-(num+'').length + 1)).join('0') + num;
-		}
-
-		var getTimeSigniture = function (seconds) {
-			var min = padder(parseInt(Math.floor(seconds/60), 10) || 0, 2);
-			var sec = padder(parseInt(seconds - (min * 60), 10) || 0, 2);
-			return [min, sec].join(":");
-		}
-
-
-		var getAudioSet = function () {
-			return $.makeArray($(self.containerID + " audio"));
-		}
-
-		var getTemplate = function (name) {
-			return _.template($("#"+name).html());
-		}
-
-		var renderSet = function (set, name){
-			var template = getTemplate(name);
-			var rendered = _(set).map(template);
-			return rendered.join('\n');
-		}
-
-		self.setContainer = function (containerID) {
-			self.containerID = "#" + containerID;
-			$("#apCtrlPlay").click(function (){ 
-				self.currentSong.play() });
-			$("#apCtrlPause").click(function (){ 
-				self.currentSong.pause() });
-			$("#apCtrlStop").click(function (){ 
-				self.currentSong.pause(); self.currentSong.currentTime = 0; });
-			$("#apCtrlNext").click(function (){ 
-				self.currentSong.currentTime = self.currentSong.duration; });
-			$("#apCtrlVolume").slider({
-				min : 0,
-				max : 100,
-				value : 100,
-				change : function (event, ui) { self.currentSong.volume = (ui.value/100)  }
-			});
-			$("#apCtrlProgress").slider({
-				min : 0,
-				max : 100,
-				value : 0,
-				range: "min",
-				change : function (event, ui) {
-					var song = self.currentSong;
-					if (song && event.originalEvent) {
-						var newTime = song.duration * (ui.value/100);
-						var delta = Math.abs(song.currentTime - newTime)
-						if (delta > 5) {
-							song.currentTime = newTime;	
-						}	
-					}
-				}
-			});
-		}
-
-		self.loadPlaylist = function (playlist) {
-			var container = $(self.containerID);
-			if (playlist.length) {
-				_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
-				container.html(renderSet(playlist, "tplPlaylistRecord"));
-				var firstSong = getAudioSet()[0];
-				firstSong.load();
-				self.currentSong = firstSong;
-				attachPlaylistEvents();	
-			}
-			else
-			{
-				container.html("Contains no streamable content");
-			}
-			
-		}
-	};
-
-
-	var archiveLoader = new function () {
-		var self = this;
-		var $ = jQuery;
-
-
-		self.searchBoxID = null;
-
-		var propertyIs = function (name, value) {
-			if (value instanceof Array)
-			{
-				return function (obj) {
-					return _(value).contains(obj[name]);
-				}
-			}
-			else
-			{
-				return function (obj) {
-					return obj[name] == value;
-				}
-			}
-		}
-
-		var loadShow = function (showURL) {
-			$.ajax({
-				url : showURL, 
-				dataType : 'jsonp', 
-				success : function (data, status) {
-					test = data;
-					//Initialize Objects
-					var defaultCreator = data.metadata.collection[0];
-					var baseURL = "http://archive.org/download/" + (data.dir.split('/').pop());
-					_(data.files).each(function (obj, key) { 
-						obj.key = key.split('/').pop();
-						obj.url = baseURL + key 
-						obj.creator = obj.creator || defaultCreator;
-						obj.title = obj.title || key.split('.')[0];
-
-					});
-					var files = _.values(data.files);
-
-					//Get target sources
-					var isOriginal = (function () {
-						var isOriginalSource = propertyIs('source', 'original');
-						var hasAllowedFormat = propertyIs('format', ['Flac', 'Shorten', 'Ogg Vorbis', 'VBR MP3', '64Kbps MP3']);
-						
-						return function (obj) {
-							return (isOriginalSource(obj) && hasAllowedFormat(obj))
-						}
-					})();
-					
-					var streamables = function (obj) {
-						var isDerivative = propertyIs('original', obj.key);
-						var isStreamable = propertyIs('format', ['Ogg Vorbis', 'VBR MP3', '64Kbps MP3']);
-						return function (file) {
-							return isDerivative(file) && isStreamable(file);
-						}
-					}
-
-					var playlist = _.chain(files)
-						.filter(isOriginal)
-						.map(function (obj) { obj.streams = _(files).filter(streamables(obj)); return obj; })
-						.filter(function (obj) { return obj.streams.length > 0 } )
-						.value();
-
-					$("#showTitle").html((data.metadata.title && data.metadata.title[0]) || "No Title");
-					$("#showTaper").html("Taper: " + (data.metadata.taper && data.metadata.taper[0]) || "None");
-					audioPlayer.loadPlaylist(playlist);
-				},
-			});	
-		}
-
-		var randomShow = function (query, showNumber) {
-			var page = (showNumber == null) ? 1 : showNumber + 1;
-			var searchURL = "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + page + "&output=json"
-			$.ajax({
-				url : searchURL, 
-				dataType : 'jsonp', 
-				success : function (data, status) {
-					test = data;
-					
-					if (showNumber != null) {
-						var id = data.response.docs[0].identifier;
-						var showURL = "http://archive.org/details/" + id + "&output=json";
-						loadShow(showURL);
-					}
-					else
-					{
-						showNumber = _.random(data.response.numFound);
-						randomShow(query, showNumber);
-					}
-
-				},
-			});
-		}
-
-		self.randomShowByCollection = function(collection) {
-			var query = "collection:" + collection;
-			randomShow(query);
-		}
-
-		self.initSearchBox = function (searchBoxID) {
-			$.ajax({
-				url : "http://archive.org/advancedsearch.php?q=mediatype%3Acollection+AND+collection%3Aetree&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=6000&page=1&output=json", 
-				dataType : 'jsonp', 
-				success : function (data, status) {
-					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
-
-					$("#" + searchBoxID).autocomplete({source:collections});
-
-				},
-			});
-		}
-	};
+	
 
 	(function ($){
 		$(document).ready(function (){
@@ -299,15 +48,15 @@
 </head>
 
 <body>
-	<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="/images/magnifying_glass_24x24.png" alt="Search"/></a>
+	<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="images/magnifying_glass_24x24.png" alt="Search"/></a>
 	<h1 id="showTitle"></h1>
 	<h2 id="showTaper"></h2>
 	<ul class="audiocontroller" id="audiocontroller">
-		<li class="audiocontrol"><img src="/images/first_16x16.png" id="apCtrlBack"/></li>
-		<li class="audiocontrol"><img src="/images/play_12x16.png"  id="apCtrlPlay"></li>
-		<li class="audiocontrol"><img src="/images/pause_12x16.png" id="apCtrlPause"></li>
-		<li class="audiocontrol"><img src="/images/stop_16x16.png"  id="apCtrlStop"></li>
-		<li class="audiocontrol"><img src="/images/last_16x16.png"  id="apCtrlNext"/></li>
+		<li class="audiocontrol"><img src="images/first_16x16.png" id="apCtrlBack"/></li>
+		<li class="audiocontrol"><img src="images/play_12x16.png"  id="apCtrlPlay"></li>
+		<li class="audiocontrol"><img src="images/pause_12x16.png" id="apCtrlPause"></li>
+		<li class="audiocontrol"><img src="images/stop_16x16.png"  id="apCtrlStop"></li>
+		<li class="audiocontrol"><img src="images/last_16x16.png"  id="apCtrlNext"/></li>
 		<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
 	</ul>
 	<ul class="audioinfo">
