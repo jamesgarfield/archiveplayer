@@ -47,13 +47,15 @@ var audioPlayer = new function() {
 		}
 	}
 
-	var makePlayer = function (song) {
-		return function () { 
-			song.load();
+	var makePlayer = function (track) {
+		return function () {
+			if (track.duration == NaN) {
+				track.load();	
+			}
 			$("#apCtrlProgress").slider("option", "value", 0)
-			$("#trackDescription").html(song.parentNode.children[0].innerText);
-			$("#trackLength").html(getTimeSigniture(song.duration));
-			song.play();
+			$("#trackDescription").html(track.parentNode.children[0].innerText);
+			$("#trackLength").html(getTimeSigniture(track.duration));
+			track.play();
 		}
 	}
 
