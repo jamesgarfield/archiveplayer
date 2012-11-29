@@ -47,40 +47,45 @@ var audioPlayer = new function() {
 		}
 	}
 
+	var updateTimes = function (track) {
+		$("#trackLength").html(getTimeSigniture(track.duration));
+		$("#trackTime").html(getTimeSigniture(song.currentTime)); 
+		$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
+	}
+
+	var updateInterface = function (track) {
+			$("#trackDescription").html(track.parentNode.children[0].innerText);
+			updateTimes(track);
+	}
+	
 	var makePlayer = function (track) {
-		return function () {
+		return 	function () {
 			if (track.duration == NaN) {
 				track.load();	
 			}
-			$("#apCtrlProgress").slider("option", "value", 0)
-			$("#trackDescription").html(track.parentNode.children[0].innerText);
-			$("#trackLength").html(getTimeSigniture(track.duration));
 			track.play();
+			updateInterface(track);
 		}
 	}
 
-	var makeTimeUpdater = function (song, nextSong) {
-		var loading = false;
-		return function () {
-			$("#trackTime").html(getTimeSigniture(song.currentTime)); 
-			$("#trackLength").html(getTimeSigniture(song.duration));
-			if (!loading && song.duration - song.currentTime < 5) {
-				loading = true;
-				nextSong.load();
+	var makeTimeUpdater = function (track, nextTrack) {
+		return 	function () {
+			var delta = track.duration - track.currentTime;
+			if (nextTrack.duration == NaN && delta < 5) {
+				nextTrack.load();
 			}
-			$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
+			updateTimes(track);
 		}
-	}
-
-
-	var padder = function (num, padding) {
-		return (new Array(padding-(num+'').length + 1)).join('0') + num;
+		
 	}
 
 	var getTimeSigniture = function (seconds) {
 		var min = padder(parseInt(Math.floor(seconds/60), 10) || 0, 2);
 		var sec = padder(parseInt(seconds - (min * 60), 10) || 0, 2);
 		return [min, sec].join(":");
+		function padder(num, padding) {
+			return (new Array(padding-(num+'').length + 1)).join('0') + num;
+		}
 	}
 
 
