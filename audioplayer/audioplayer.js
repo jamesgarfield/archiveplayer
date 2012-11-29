@@ -163,7 +163,6 @@ var audioPlayer = new function() {
 	var pauseTrack = function (track) {
 		try {
 			track.pause();
-			track.currentTime = 0;	
 		}
 		catch (e)
 		{
