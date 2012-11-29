@@ -69,7 +69,7 @@ var audioPlayer = new function() {
 	}
 
 	var makeTimeUpdater = function (track, nextTrack) {
-		var loadNext = _.throttle(function () { nextTrack.load() }, 5100);
+		var loadNext = _.once(function () { nextTrack.load() });
 		return 	function () {
 			var delta = track.duration - track.currentTime;
 			if (isNaN(nextTrack.duration)  && delta < 5) {
