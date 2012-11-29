@@ -49,8 +49,8 @@ var audioPlayer = new function() {
 
 	var updateTimes = function (track) {
 		$("#trackLength").html(getTimeSigniture(track.duration));
-		$("#trackTime").html(getTimeSigniture(song.currentTime)); 
-		$("#apCtrlProgress").slider("option", "value", (song.currentTime/song.duration)*100)
+		$("#trackTime").html(getTimeSigniture(track.currentTime)); 
+		$("#apCtrlProgress").slider("option", "value", (track.currentTime/track.duration)*100)
 	}
 
 	var updateInterface = function (track) {
