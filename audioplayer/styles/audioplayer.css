@@ -32,3 +32,5 @@
 .audioinfo div {
 	display: inline-block;
 }
+
+a.ui-slider-handle.ui-state-default.ui-corner-all { z-index: 0; }
