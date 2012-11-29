@@ -22,7 +22,7 @@ var archiveLoader = new function () {
 
 	var loadShow = function (showURL) {
 		$.ajax({
-			url : showURL, 
+			url : showURL + "&output=json", 
 			dataType : 'jsonp', 
 			success : function (data, status) {
 				test = data;
@@ -62,7 +62,7 @@ var archiveLoader = new function () {
 					.filter(function (obj) { return obj.streams.length > 0 } )
 					.value();
 
-				$("#showTitle").html((data.metadata.title && data.metadata.title[0]) || "No Title");
+				$("#showTitle").html('<a href="' + showURL +'">' + ((data.metadata.title && data.metadata.title[0]) || "No Title") +"</a>" );
 				$("#showTaper").html("Taper: " + (data.metadata.taper && data.metadata.taper[0]) || "None");
 				audioPlayer.loadPlaylist(playlist);
 			},
@@ -80,7 +80,7 @@ var archiveLoader = new function () {
 				
 				if (showNumber != null) {
 					var id = data.response.docs[0].identifier;
-					var showURL = "http://archive.org/details/" + id + "&output=json";
+					var showURL = "http://archive.org/details/" + id;
 					loadShow(showURL);
 				}
 				else
@@ -99,13 +99,20 @@ var archiveLoader = new function () {
 	}
 
 	self.initSearchBox = function (searchBoxID) {
+		var id = "#" + searchBoxID;
 		$.ajax({
 			url : "http://archive.org/advancedsearch.php?q=mediatype%3Acollection+AND+collection%3Aetree&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=6000&page=1&output=json", 
 			dataType : 'jsonp', 
 			success : function (data, status) {
 				var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
 
-				$("#" + searchBoxID).autocomplete({source:collections});
+				$(id).autocomplete({source:collections});
+				$(id).keypress(function (event) {
+					if (event.which == 13) //Enter Key
+					{
+						self.randomShowByCollection($(id).val())
+					}
+				});
 
 			},
 		});
