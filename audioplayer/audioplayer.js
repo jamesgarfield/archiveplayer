@@ -60,7 +60,7 @@ var audioPlayer = new function() {
 	
 	var makePlayer = function (track) {
 		return 	function () {
-			if (track.duration == NaN) {
+			if (isNaN(track.duration)) {
 				track.load();	
 			}
 			track.play();
@@ -71,7 +71,7 @@ var audioPlayer = new function() {
 	var makeTimeUpdater = function (track, nextTrack) {
 		return 	function () {
 			var delta = track.duration - track.currentTime;
-			if (nextTrack.duration == NaN && delta < 5) {
+			if (isNaN(nextTrack.duration)  && delta < 5) {
 				nextTrack.load();
 			}
 			updateTimes(track);
