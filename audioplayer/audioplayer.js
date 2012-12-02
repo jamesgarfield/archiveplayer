@@ -10,7 +10,7 @@ var audioPlayer = new function() {
 	var attachPlaylistEvents = function() {
 
 		var playlist = getAudioSet();
-		var meta = $.makeArray($(self.containerID + " .songmetainfo"));
+		var meta = $.makeArray($(self.containerID + " .playlistEntry"));
 		for (var i = 0; i < playlist.length-1; i++)
 		{
 			var currentSong = playlist[i];
