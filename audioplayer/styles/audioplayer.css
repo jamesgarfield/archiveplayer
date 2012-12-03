@@ -12,7 +12,7 @@
 }
 
 .audiopane {
-	display: inline-block;
+	float: left;
 }
 
 .apVolume {
