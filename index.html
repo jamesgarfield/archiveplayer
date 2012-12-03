@@ -15,7 +15,7 @@
 
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
-			<%= data.creator %> - <%= data.title %>
+			<span class="playlistEntryInfo"><%= data.creator %> - <%= data.title %></span>
 			<audio preload="none">
 				<%= data.streams %>
 			</audio>
@@ -54,7 +54,7 @@
 		<h1 id="showTitle"></h1>
 		<h2 id="showTaper"></h2>
 	</div>
-	<span id="audiopane">
+	<div id="audiopane">
 		<h3 class="description" id="trackDescription">No Media Loaded</h3>
 		<ul class="audioinfo">
 			<li class="time" id="trackTime">00:00</li>

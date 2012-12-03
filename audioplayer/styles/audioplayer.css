@@ -1,3 +1,20 @@
+.playlist {
+	float : left;
+}
+
+.playlistEntry {
+	cursor : pointer;
+	border-width: 1px;
+}
+
+.playlistEntry:hover {
+	background: #C0D0FE;
+}
+
+.audiopane {
+	display: inline-block;
+}
+
 .apVolume {
 	height : 5px;
 	width : 50px;
@@ -19,6 +36,10 @@
 	vertical-align: middle;
 }
 
+.audiocontrol {
+	cursor : pointer;
+}
+
 .audiocontroller div {
 	display: inline-block;
 	vertical-align: top;
@@ -34,3 +55,4 @@
 }
 
 a.ui-slider-handle.ui-state-default.ui-corner-all { z-index: 0; }
+
