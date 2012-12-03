@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
 	<script type="text/javascript" src="//raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
-	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director-1.1.6.min.js"></script>
+	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director-1.1.6.js"></script>
 
 	<script type="text/javascript" src="audioplayer/audioplayer.js"></script>
 	<script type="text/javascript" src="archiveloader/archiveloader.js"></script>
@@ -38,9 +38,8 @@
 			$("#generatePlaylist").click(function () { archiveLoader.randomShowByCollection($("#searchBox").val()); });
 
 			var router = Router({
+				"/archive/show/:showID" : archiveLoader.showByID,
 				"/archive/artist/:artistName" : archiveLoader.randomShowByCollection,
-				"/archive/random/artist/:artistName" : archiveLoader.randomShowByCollection,
-				"/archive/show/:showID" : archiveLoader.loadShow,
 				"/archive/taper/:taperName" : archiveLoader.randomShowByTaper
 			});
 			router.init();

@@ -22,11 +22,14 @@ var archiveLoader = new function () {
 
 	var loadShow = function (showID) {
 		var showURL = "http://archive.org/details/" + showID;
-		if ('history' in window) {
+		
+		var newHash = "#/archive/show/" + showID;
+
+		if (window.location.hash != newHash && ('history' in window)) {
 			window.history.pushState(null, null, window.location.href);
 		}
 		
-		window.location.hash = "#/archive/show/" + showID	
+		window.location.hash = newHash;
 		
 		$.ajax({
 			url : showURL + "&output=json", 
@@ -107,6 +110,10 @@ var archiveLoader = new function () {
 	self.randomShowByTaper = function (taper) {
 		var query = 'collection:"etree" AND (taper:(' +  taper + "))";
 		randomShow(query);
+	}
+
+	self.showByID = function(showID) {
+		loadShow(showID);
 	}
 
 	self.initSearchBox = function (searchBoxID) {
