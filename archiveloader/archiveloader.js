@@ -104,6 +104,11 @@ var archiveLoader = new function () {
 		randomShow(query);
 	}
 
+	self.randomShowByTaper = function (taper) {
+		var query = 'collection:"etree" AND (taper:(' +  taper + "))";
+		randomShow(query);
+	}
+
 	self.initSearchBox = function (searchBoxID) {
 		var id = "#" + searchBoxID;
 		$.ajax({

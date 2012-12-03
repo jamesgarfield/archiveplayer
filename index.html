@@ -40,7 +40,8 @@
 			var router = Router({
 				"/archive/artist/:artistName" : archiveLoader.randomShowByCollection,
 				"/archive/random/artist/:artistName" : archiveLoader.randomShowByCollection,
-				"/archive/show/:showID" : archiveLoader.loadShow
+				"/archive/show/:showID" : archiveLoader.loadShow,
+				"/archive/taper/:taperName" : archiveLoader.randomShowByTaper
 			});
 			router.init();
 		})
