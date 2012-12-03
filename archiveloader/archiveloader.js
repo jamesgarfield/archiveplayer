@@ -20,7 +20,9 @@ var archiveLoader = new function () {
 		}
 	}
 
-	var loadShow = function (showURL) {
+	var loadShow = function (showID) {
+		var showURL = "http://archive.org/details/" + showID;
+		window.location.hash = "#/archive/show/" + showID
 		$.ajax({
 			url : showURL + "&output=json", 
 			dataType : 'jsonp', 
@@ -79,9 +81,8 @@ var archiveLoader = new function () {
 				test = data;
 				
 				if (showNumber != null) {
-					var id = data.response.docs[0].identifier;
-					var showURL = "http://archive.org/details/" + id;
-					loadShow(showURL);
+					var showID = data.response.docs[0].identifier;
+					loadShow(showID);
 				}
 				else
 				{
