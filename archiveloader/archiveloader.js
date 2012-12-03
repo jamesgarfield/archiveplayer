@@ -104,6 +104,14 @@ var archiveLoader = new function () {
 
 	self.randomShowByCollection = function(collection) {
 		var query = "collection:" + collection;
+
+		var newHash = "#/archive/artist/" + collection;
+
+		if (window.location.hash != newHash && ('history' in window)) {
+			window.history.pushState(null, null, window.location.href);
+		}
+		
+		window.location.hash = newHash;
 		randomShow(query);
 	}
 
