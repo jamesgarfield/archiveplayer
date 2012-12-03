@@ -22,7 +22,12 @@ var archiveLoader = new function () {
 
 	var loadShow = function (showID) {
 		var showURL = "http://archive.org/details/" + showID;
-		window.location.hash = "#/archive/show/" + showID
+		if ('history' in window) {
+			window.history.pushState(null, null, window.location.href);
+		}
+		
+		window.location.hash = "#/archive/show/" + showID	
+		
 		$.ajax({
 			url : showURL + "&output=json", 
 			dataType : 'jsonp', 

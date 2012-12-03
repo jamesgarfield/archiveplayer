@@ -38,6 +38,7 @@
 			$("#generatePlaylist").click(function () { archiveLoader.randomShowByCollection($("#searchBox").val()); });
 
 			var router = Router({
+				"/archive/artist/:artistName" : archiveLoader.randomShowByCollection,
 				"/archive/random/artist/:artistName" : archiveLoader.randomShowByCollection,
 				"/archive/show/:showID" : archiveLoader.loadShow
 			});
