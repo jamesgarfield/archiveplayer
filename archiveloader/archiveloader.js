@@ -2,6 +2,7 @@ var archiveLoader = new function () {
 	var self = this;
 	var $ = jQuery;
 
+	var useHistory = ('history' in window)
 
 	self.searchBoxID = null;
 
@@ -26,10 +27,9 @@ var archiveLoader = new function () {
 		var newHash = "#/archive/show/" + showID;
 
 		if (window.location.hash != newHash && ('history' in window)) {
-			window.history.pushState(null, null, window.location.href);
+			window.history.pushState(null, null, newHash);
 		}
 		
-		window.location.hash = newHash;
 		
 		$.ajax({
 			url : showURL + "&output=json", 
@@ -72,7 +72,7 @@ var archiveLoader = new function () {
 					.filter(function (obj) { return obj.streams.length > 0 } )
 					.value();
 
-				$("#showTitle").html('<a href="' + showURL +'">' + ((data.metadata.title && data.metadata.title[0]) || "No Title") +"</a>" );
+				$("#showTitle").html('<a href="' + showURL +'" window="_blank">' + ((data.metadata.title && data.metadata.title[0]) || "No Title") +"</a>" );
 				$("#showTaper").html("Taper: " + (data.metadata.taper && data.metadata.taper[0]) || "None");
 				audioPlayer.loadPlaylist(playlist);
 			},
@@ -108,10 +108,10 @@ var archiveLoader = new function () {
 		var newHash = "#/archive/artist/" + collection;
 
 		if (window.location.hash != newHash && ('history' in window)) {
-			window.history.pushState(null, null, window.location.href);
+			window.history.pushState(null, null, newHash);
 		}
 		
-		window.location.hash = newHash;
+		
 		randomShow(query);
 	}
 
