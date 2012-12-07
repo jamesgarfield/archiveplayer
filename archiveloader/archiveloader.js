@@ -80,7 +80,7 @@ var archiveLoader = new function () {
 	}
 
 	var randomShow = function (query, showNumber) {
-		var page = (showNumber == null) ? 1 : showNumber + 1;
+		var page = showNumber ? (showNumber + 1) : 1;
 		var searchURL = "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + page + "&output=json"
 		$.ajax({
 			url : searchURL, 
