@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-	<link rel="stylesheet" href="styles/meyerreset.css"/>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"/>
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="audioplayer/styles/audioplayer.css"/>
+
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
+	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director-1.1.8.min.js"></script>
 	<script type="text/javascript" src="//raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
-	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director-1.1.6.min.js"></script>
+	
 
 	<script type="text/javascript" src="audioplayer/audioplayer.js"></script>
 	<script type="text/javascript" src="archiveloader/archiveloader.js"></script>
@@ -30,21 +31,40 @@
 	</script>
 
 	<script type="text/javascript">
+	_.templateSettings.variable = "data";
+
 	(function ($){
 		$(document).ready(function (){
-			_.templateSettings.variable = "data";
-
-			audioPlayer.setContainer("playlistContainer");
-			archiveLoader.initSearchBox("searchBox");
-			
-			$("#generatePlaylist").click(function () { archiveLoader.randomShowByCollection($("#searchBox").val()); });
-
+	
 			var router = Router({
 				"/archive/show/:showID" : archiveLoader.showByID,
 				"/archive/artist/:artistName" : archiveLoader.randomShowByCollection,
 				"/archive/taper/:taperName" : archiveLoader.randomShowByTaper
 			});
 			router.init();
+
+
+			audioPlayer.setContainer("playlistContainer");
+			archiveLoader.initSearchBox("searchInput");
+			
+			$("#searchBtn").click(function () { 
+				archiveLoader.randomShowByCollection($("#searchInput").val()); 
+				$("#app").carousel('next');
+			});
+
+			$('.carousel').carousel({
+				interval : false
+			});
+
+			$(".appframe").each(function (index, element) {
+				element.style.margin = "auto";
+				element.style.width = parseInt(Math.min(600, $(window).width()), 10) + "px";
+			});
+
+			$("#navSearch").click(function () {
+				$("#app").carousel('next');
+			})
+
 		})
 	})(jQuery);
 	</script>
@@ -52,29 +72,37 @@
 
 
 <body>
-	<div>
-	<div class="metapane" id="metapane" style="float:right;">
-		Select Artist:<input type="text" id="searchBox"/><a href="#" id="generatePlaylist"><img src="audioplayer/images/magnifying_glass_24x24.png" alt="Search"/>Search</a>
-		<h1 id="showTitle"></h1>
-		<h2 id="showTaper"></h2>
-	</div>
-	<div id="audiopane">
-		<h3 class="description" id="trackDescription">No Media Loaded</h3>
-		<ul class="audioinfo">
-			<li class="time" id="trackTime">00:00</li>
-			<li class="audiocontrol" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
-			<li class="time" id="trackLength">&infin;</li>
-		</ul>
-		<ul class="audiocontroller" id="audiocontroller">
-			<li class="audiocontrol"><img src="audioplayer/images/first_16x16.png" id="apCtrlBack"/></li>
-			<li class="audiocontrol"><img src="audioplayer/images/play_12x16.png"  id="apCtrlPlay"></li>
-			<li class="audiocontrol"><img src="audioplayer/images/pause_12x16.png" id="apCtrlPause"></li>
-			<li class="audiocontrol"><img src="audioplayer/images/stop_16x16.png"  id="apCtrlStop"></li>
-			<li class="audiocontrol"><img src="audioplayer/images/last_16x16.png"  id="apCtrlNext"/></li>
-			<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
-		</ul>
-		<ul class="playlist" id="playlistContainer">
-		</ul>
+	<div id="app" class="carousel slide">
+		<div class="carousel-inner">
+			<div id="search_frame" class="active item">
+				<div id="searchBox" class="appframe">
+					<center>Select Artist:<input id="searchInput" type="text" autofocus/><button id="searchBtn" class="btn">Search</button></center>
+				</div>
+			</div>
+			<div id="player_frame" class="item">
+				<div id="audiopane" class="appframe">
+					<i id="navSearch" class="icon-search" />
+					<h4 id="showTitle"></h1>
+					<h5 id="showTaper"></h2>
+					<h6 class="description" id="trackDescription">No Media Loaded</h3>
+					<ul class="audioinfo">
+						<li class="time" id="trackTime">00:00</li>
+						<li class="audiocontrol" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
+						<li class="time" id="trackLength">&infin;</li>
+					</ul>
+					<ul class="audiocontroller" id="audiocontroller">
+						<li class="audiocontrol"><img src="audioplayer/images/first_16x16.png" id="apCtrlBack"/></li>
+						<li class="audiocontrol"><img src="audioplayer/images/play_12x16.png"  id="apCtrlPlay"></li>
+						<li class="audiocontrol"><img src="audioplayer/images/pause_12x16.png" id="apCtrlPause"></li>
+						<li class="audiocontrol"><img src="audioplayer/images/stop_16x16.png"  id="apCtrlStop"></li>
+						<li class="audiocontrol"><img src="audioplayer/images/last_16x16.png"  id="apCtrlNext"/></li>
+						<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
+					</ul>
+					<ul class="playlist" id="playlistContainer">
+					</ul>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 </body>
