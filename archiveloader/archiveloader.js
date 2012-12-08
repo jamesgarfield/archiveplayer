@@ -124,23 +124,10 @@ var archiveLoader = new function () {
 		loadShow(showID);
 	}
 
-	self.initSearchBox = function (searchBoxID) {
-		var id = "#" + searchBoxID;
-		$.ajax({
+	self.getCollections = function () {
+		return $.ajax({
 			url : "http://archive.org/advancedsearch.php?q=mediatype%3Acollection+AND+collection%3Aetree&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=6000&page=1&output=json", 
-			dataType : 'jsonp', 
-			success : function (data, status) {
-				var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
-
-				$(id).autocomplete({source:collections});
-				$(id).keypress(function (event) {
-					if (event.which == 13) //Enter Key
-					{
-						self.randomShowByCollection($(id).val())
-					}
-				});
-
-			},
+			dataType : 'jsonp'
 		});
 	}
 };
