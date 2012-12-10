@@ -12,7 +12,9 @@
 }
 
 .playlist {
-/*	float : left;*/
+	list-style: none;
+	margin : 0 0 0 5px;
+	padding : 0;
 }
 
 .playlistEntry {
@@ -55,7 +57,7 @@
 .audiocontroller div {
 	display: inline-block;
 	vertical-align: top;
-	margin-top: 5px;
+	margin: 0 5px 0 0;
 }
 
 .audioinfo li {
