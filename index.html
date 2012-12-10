@@ -42,9 +42,15 @@
 	(function ($){
 		$(document).ready(function (){
 			
+			$('.carousel').carousel({
+				interval : false
+			});
+
 			var navigateToPlaylist = after(function () {
 				$("#app").carousel(1);
 			})
+
+
 
 			archiveLoader.showByID = navigateToPlaylist(archiveLoader.showByID);
 			archiveLoader.randomShowByCollection = navigateToPlaylist(archiveLoader.randomShowByCollection);
@@ -86,9 +92,7 @@
 				archiveLoader.randomShowByCollection($("#searchInput").val());
 			});
 
-			$('.carousel').carousel({
-				interval : false
-			});
+			
 
 			$(".appframe").each(function (index, element) {
 				element.style.margin = "auto";
