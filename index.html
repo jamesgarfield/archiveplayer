@@ -122,7 +122,7 @@
 					        </div>
 			            </div>
 			            <div class="ui-block-b">
-			        		<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search" >    	
+			        		<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search">    	
 			            </div>
 			        </div>
 	            </div>
@@ -137,7 +137,7 @@
 					        </div>
 			            </div>
 			            <div class="ui-block-b">
-			        		<input id="taperSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search" >    	
+			        		<input id="taperSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left"  value="Search">    	
 			            </div>
 			        </div>
 	            </div>
@@ -156,9 +156,17 @@
 	<div data-role="page" id="playlist">
 	    <div data-role="content">
 	        <div>
-	            <div class="ui-grid-a">
-		            <div class="ui-block-a">
-		            	<div data-role="controlgroup" data-type="horizontal" data-theme="c">
+	        	<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<h5 id="showTitle">
+				        </h5>
+					</div>
+					<div class="ui-block-b">
+						<h6 id="showTaper">
+			        	</h6>
+					</div>
+					<div class="ui-block-a">
+						<div data-role="controlgroup" data-type="horizontal" data-theme="c">
 							<a id="apCtrlPlay" data-role="button" href="#" style="background-image: url(audioplayer/images/play.png); background-repeat: no-repeat; background-position:50%;">
 								<br/>
 							</a>
@@ -172,15 +180,11 @@
 								<br/>
 							</a>
 						</div>
-		            </div>
-		            <div class="ui-block-b">
-		            	<h5 id="showTitle">
-				        </h5>
-			        	<h6 id="showTaper">
-			        	</h6>
-		            </div>
-		        </div>
-	            
+					</div>
+					<div class="ui-block-b">
+						
+					</div>
+				</div> 
 	        </div>
 	        <ul id="playlistContainer" data-role="listview" data-divider-theme="c" data-inset="true">
 	            <li data-theme="c">
