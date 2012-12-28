@@ -62,7 +62,7 @@
 							showPlaylist(playlist.files);
 						}
 						else if (attempt < 10){
-							pickRandomShow(collection);
+							pickRandomShow(collection, (attempt || 0) + 1);
 						}
 						else
 						{
