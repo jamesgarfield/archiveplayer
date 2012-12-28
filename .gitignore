@@ -1,4 +1,6 @@
-mongoose*.exe
+mongoose*
+*.old
+*.zip
 
 #################
 ## Eclipse
