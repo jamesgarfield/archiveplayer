@@ -112,7 +112,7 @@ var archiveLoader = new function () {
 	}
 
 	self.randomShowByTaper = function (taper) {
-		randomShow('collection:"etree" AND (taper:(' +  taper + "))");
+		return randomShow('collection:"etree" AND (taper:(' +  taper + "))");
 	}
 
 	self.showByID = function(showID) {
