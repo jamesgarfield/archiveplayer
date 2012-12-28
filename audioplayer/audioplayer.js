@@ -106,11 +106,11 @@ var audioPlayer = new function() {
 
 	self.setContainer = function (containerID) {
 		self.containerID = "#" + containerID;
-		/*$("#apCtrlPlay").click( function () { self.play();  });
+		$("#apCtrlPlay").click( function () { self.play();  });
 		$("#apCtrlPause").click(function () { self.pause(); });
 		$("#apCtrlStop").click( function () { self.stop();  });
 		$("#apCtrlNext").click( function () { self.next();  });
-		$("#apCtrlVolume").slider({
+		/*$("#apCtrlVolume").slider({
 			min : 0,
 			max : 100,
 			value : 100,

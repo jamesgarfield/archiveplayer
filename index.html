@@ -51,7 +51,9 @@
 				});
 
 			var showPlaylist = function (playlist) {
-				$.mobile.changePage("#playlistPage");
+				$.mobile.changePage("#playlist");
+				$("#showTitle").html('<a href="' + playlist.originalURL +'" window="_blank">' + playlist.title +"</a>" );
+				$("#showTaper").html("Taper: " + playlist.taper);
 				audioPlayer.loadPlaylist(playlist.files);
 			}
 
@@ -91,24 +93,56 @@
 
 <body>
 	
-	<div data-role="page" id="searchPage">
+	<div data-role="page" id="search">
 	    <div data-role="content">
-	        <div data-role="fieldcontain">
-	            <fieldset data-role="controlgroup">
-	                <label for="searchBox">
-	                </label>
-	                <input name="" id="searchBox" placeholder="Lotus" value="" type="search">
-	            </fieldset>
+	    	<div class="ui-grid-a">
+	            <div class="ui-block-a">
+	            	<div data-role="fieldcontain">
+			                <input name="" id="searchBox" placeholder="Lotus" value="" type="search">
+			        </div>
+	            </div>
+	            <div class="ui-block-b">
+	        		<input id="searchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search" >    	
+	            </div>
 	        </div>
-	        <input id="searchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search" >
 	    </div>
+        <div data-role="footer" data-id="navbar">		
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#search" data-iconpos="inline" data-icon="search" class="ui-btn-active">Search</a></li>
+					<li><a href="#playlist" data-iconpos="inline" data-icon="grid">Playlist</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
 	</div>
-	<div data-role="page" id="playlistPage">
+	<div data-role="page" id="playlist">
 	    <div data-role="content">
 	        <div>
-	            <a id="showTitle" href="" target="_blank" data-transition="fade">
-	                Show Name Here
-	            </a>
+	            <div class="ui-grid-a">
+		            <div class="ui-block-a">
+		            	<div data-role="controlgroup" data-type="horizontal" data-theme="c">
+							<a id="apCtrlPlay" data-role="button" href="#" style="background-image: url(audioplayer/images/play.png); background-repeat: no-repeat; background-position:50%;">
+								<br/>
+							</a>
+							<a id="apCtrlPause" data-role="button" href="#" style="background-image: url(audioplayer/images/pause.png); background-repeat: no-repeat; background-position:50%;">
+								<br/>
+							</a>
+							<a id="apCtrlStop" data-role="button" href="#" style="background-image: url(audioplayer/images/stop.png); background-repeat: no-repeat; background-position:50%;">
+								<br/>
+							</a>
+							<a id="apCtrlNext" data-role="button" href="#" style="background-image: url(audioplayer/images/next.png); background-repeat: no-repeat; background-position:50%;">
+								<br/>
+							</a>
+						</div>
+		            </div>
+		            <div class="ui-block-b">
+		            	<h5 id="showTitle">
+				        </h5>
+			        	<h6 id="showTaper">
+			        	</h6>
+		            </div>
+		        </div>
+	            
 	        </div>
 	        <ul id="playlistContainer" data-role="listview" data-divider-theme="c" data-inset="true">
 	            <li data-theme="c">
@@ -118,6 +152,14 @@
 	            </li>
 	        </ul>
 	    </div>
+	    <div data-role="footer" data-id="navbar">		
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#search" data-iconpos="inline" data-icon="search">Search</a></li>
+						<li><a href="#" data-iconpos="inline" data-icon="grid">Playlist</a></li>
+					</ul>
+				</div><!-- /navbar -->
+			</div><!-- /footer -->
 	</div>
 	
 </body>
