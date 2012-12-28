@@ -3,14 +3,14 @@
 
 <head>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"/>
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="audioplayer/styles/audioplayer.css"/>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
-	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director-1.1.8.min.js"></script>
+	<script type="text/javascript" src="//raw.github.com/flatiron/director/master/build/director.min.js"></script>
 	<script type="text/javascript" src="//raw.github.com/raganwald/method-combinators/master/lib/method-combinators.js"></script>
 	
 
@@ -42,67 +42,47 @@
 	(function ($){
 		$(document).ready(function (){
 			
-			$('.carousel').carousel({
-				interval : false
-			});
-
-			var navigateToPlaylist = after(function () {
-				$("#app").carousel(1);
-			})
-
-
-
-			archiveLoader.showByID = navigateToPlaylist(archiveLoader.showByID);
-			archiveLoader.randomShowByCollection = navigateToPlaylist(archiveLoader.randomShowByCollection);
-			archiveLoader.randomShowByTaper = navigateToPlaylist(archiveLoader.randomShowByTaper);
-
-			var router = Router({
-				"/archive/show/:showID" : archiveLoader.showByID,
-				"/archive/artist/:artistName" : archiveLoader.randomShowByCollection,
-				"/archive/taper/:taperName" : archiveLoader.randomShowByTaper
-			});
-			router.init();
-
 			audioPlayer.setContainer("playlistContainer");
 			//archiveLoader.initSearchBox("searchInput");
 			archiveLoader.getCollections()
 				.then(function (data, status) {
-					//var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
-					//$("#searchInput").autocomplete({source:collections});
-					var collections = _(data.response.docs).map(_.propertySelect("identifier"));
-					var nicename = _(data.response.docs).map(_.propertySelect("title"));
-					$("#searchInput").typeahead({
-						source : nicename,
-						updater : function (item) {
-							var index = nicename.indexOf(item);
-							archiveLoader.randomShowByCollection(collections[index]);
-							return collections[index];
-						}
-					});
+					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
+					$("#searchBox").autocomplete({source:collections});	
 				});
 
-			$("#searchInput").keypress(function (event) {
+			var showPlaylist = function (playlist) {
+				$.mobile.changePage("#playlistPage");
+				audioPlayer.loadPlaylist(playlist.files);
+			}
+
+			var pickRandomShow = function (collection, attempt) {
+				archiveLoader.randomShowByCollection(collection).
+					then(function (playlist) {
+						if (playlist.files.length > 0) {
+							showPlaylist(playlist.files);
+						}
+						else if (attempt < 10){
+							pickRandomShow(collection);
+						}
+						else
+						{
+							alert("Could Not Find a Show");
+						}
+					});
+			}
+
+			$("#searchBox").keypress(function (event) {
 				if (event.which == 13) //Enter Key
 				{
-					archiveLoader.randomShowByCollection($("#searchInput").val())
+					archiveLoader.randomShowByCollection($("#searchBox").val()).
+						then(showPlaylist);
 				}
 			});
 			
 			$("#searchBtn").click(function () { 
-				archiveLoader.randomShowByCollection($("#searchInput").val());
+				archiveLoader.randomShowByCollection($("#searchBox").val()).
+					then(showPlaylist);
 			});
-
-			
-
-			$(".appframe").each(function (index, element) {
-				element.style.margin = "auto";
-				element.style.width = parseInt(Math.min(600, $(window).width()), 10) + "px";
-			});
-
-			$("#navSearch").click(function () {
-				$("#app").carousel(0);
-			})
-
 		})
 	})(jQuery);
 	</script>
@@ -110,38 +90,35 @@
 
 
 <body>
-	<div id="app" class="carousel slide">
-		<div class="carousel-inner">
-			<div id="search_frame" class="active item">
-				<div id="searchBox" class="appframe">
-					<center>Select Artist:<input id="searchInput" type="text" autofocus/><button id="searchBtn" class="btn">Search</button></center>
-				</div>
-			</div>
-			<div id="player_frame" class="item">
-				<div id="audiopane" class="appframe">
-					<i id="navSearch" class="icon-search"></i>
-					<h4 id="showTitle"></h1>
-					<h5 id="showTaper"></h2>
-					<h6 class="description" id="trackDescription">No Media Loaded</h3>
-					<ul class="audioinfo">
-						<li class="time" id="trackTime">00:00</li>
-						<li class="audiocontrol" id="trackProgress"><div class="apProgress" id="apCtrlProgress"></div></li>
-						<li class="time" id="trackLength">&infin;</li>
-					</ul>
-					<ul class="audiocontroller" id="audiocontroller">
-						<li class="audiocontrol"><img src="audioplayer/images/first_16x16.png" id="apCtrlBack"/></li>
-						<li class="audiocontrol"><img src="audioplayer/images/play_12x16.png"  id="apCtrlPlay"></li>
-						<li class="audiocontrol"><img src="audioplayer/images/pause_12x16.png" id="apCtrlPause"></li>
-						<li class="audiocontrol"><img src="audioplayer/images/stop_16x16.png"  id="apCtrlStop"></li>
-						<li class="audiocontrol"><img src="audioplayer/images/last_16x16.png"  id="apCtrlNext"/></li>
-						<li class="audiocontrol"><div class="apVolume" id="apCtrlVolume"></div></li>
-					</ul>
-					<ul class="playlist" id="playlistContainer">
-					</ul>
-				</div>
-			</div>
-		</div>
+	
+	<div data-role="page" id="searchPage">
+	    <div data-role="content">
+	        <div data-role="fieldcontain">
+	            <fieldset data-role="controlgroup">
+	                <label for="searchBox">
+	                </label>
+	                <input name="" id="searchBox" placeholder="Lotus" value="" type="search">
+	            </fieldset>
+	        </div>
+	        <input id="searchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search" >
+	    </div>
 	</div>
-</div>
+	<div data-role="page" id="playlistPage">
+	    <div data-role="content">
+	        <div>
+	            <a id="showTitle" href="" target="_blank" data-transition="fade">
+	                Show Name Here
+	            </a>
+	        </div>
+	        <ul id="playlistContainer" data-role="listview" data-divider-theme="c" data-inset="true">
+	            <li data-theme="c">
+	                <a href="#page1" data-transition="slide">
+	                    Song1
+	                </a>
+	            </li>
+	        </ul>
+	    </div>
+	</div>
+	
 </body>
 </html>

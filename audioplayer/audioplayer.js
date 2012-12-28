@@ -106,7 +106,7 @@ var audioPlayer = new function() {
 
 	self.setContainer = function (containerID) {
 		self.containerID = "#" + containerID;
-		$("#apCtrlPlay").click( function () { self.play();  });
+		/*$("#apCtrlPlay").click( function () { self.play();  });
 		$("#apCtrlPause").click(function () { self.pause(); });
 		$("#apCtrlStop").click( function () { self.stop();  });
 		$("#apCtrlNext").click( function () { self.next();  });
@@ -131,7 +131,7 @@ var audioPlayer = new function() {
 					}	
 				}
 			}
-		});
+		});*/
 	}
 
 	self.loadPlaylist = function (playlist) {
@@ -139,6 +139,7 @@ var audioPlayer = new function() {
 		if (playlist.length) {
 			_(playlist).each(function (obj) { obj.streams = renderSet(obj.streams, 'tplStreamSource'); });
 			container.html(renderSet(playlist, "tplPlaylistRecord"));
+			container.listview('refresh')
 			var audioSet = getAudioSet();
 			var firstSong = audioSet[0];
 			var nextSong = audioSet[1];

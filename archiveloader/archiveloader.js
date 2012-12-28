@@ -21,20 +21,10 @@ var archiveLoader = new function () {
 		}
 	}
 
-	var loadShow = function (showID) {
-		var showURL = "http://archive.org/details/" + showID;
+	var getShowPlaylist = function (showID) {
 		
-		var newHash = "#/archive/show/" + showID;
-
-		if (window.location.hash != newHash && ('history' in window)) {
-			window.history.pushState(null, null, newHash);
-		}
-		
-		
-		$.ajax({
-			url : showURL + "&output=json", 
-			dataType : 'jsonp', 
-			success : function (data, status) {
+		return getShowData(showID).
+			pipe(function (data, status) {
 				test = data;
 				//Initialize Objects
 				var defaultCreator = data.metadata.collection[0];
@@ -44,10 +34,9 @@ var archiveLoader = new function () {
 					obj.url = baseURL + key 
 					obj.creator = obj.creator || defaultCreator;
 					obj.title = obj.title || key.split('.')[0];
-
 				});
+				
 				var files = _.values(data.files);
-
 				//Get target sources
 				var isOriginal = (function () {
 					var isOriginalSource = propertyIs('source', 'original');
@@ -66,58 +55,64 @@ var archiveLoader = new function () {
 					}
 				}
 
-				var playlist = _.chain(files)
+				var audio = _.chain(files)
 					.filter(isOriginal)
-					.map(function (obj) { obj.streams = _(files).filter(streamables(obj)); return obj; })
-					.filter(function (obj) { return obj.streams.length > 0 } )
+					.map(function (obj) {
+						 obj.streams = _(files).filter(streamables(obj)); return obj; 
+					})
+					.filter(function (obj) {
+					 	return obj.streams.length > 0 
+					 })
 					.value();
-
-				$("#showTitle").html('<a href="' + showURL +'" window="_blank">' + ((data.metadata.title && data.metadata.title[0]) || "No Title") +"</a>" );
-				$("#showTaper").html("Taper: " + (data.metadata.taper && data.metadata.taper[0]) || "None");
-				audioPlayer.loadPlaylist(playlist);
-			},
-		});	
+				
+				var playlist = {
+					title : ((data.metadata.title && data.metadata.title[0]) || "No Title"),
+					originalURL : "http://archive.org/details/" + showID,
+					taper : ((data.metadata.taper && data.metadata.taper[0]) || "None"),
+					files : audio
+				}
+				return playlist;
+			});
 	}
 
-	var randomShow = function (query, showNumber) {
-		var page = showNumber ? (showNumber + 1) : 1;
-		var searchURL = "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + page + "&output=json"
-		$.ajax({
-			url : searchURL, 
-			dataType : 'jsonp', 
-			success : function (data, status) {
-				test = data;
-				
-				if (showNumber != null) {
-					var showID = data.response.docs[0].identifier;
-					loadShow(showID);
-				}
-				else
-				{
-					showNumber = _.random(data.response.numFound);
-					randomShow(query, showNumber);
-				}
+	var getShowData = function getShowData(showID) {
+		return $.ajax({
+			url : "http://archive.org/details/" + showID + "&output=json", 
+			dataType : 'jsonp'
+		});
+	}
 
-			},
+	var randomShow = function (query) {
+		return getRandomShowID(query).
+			pipe(getShowPlaylist);
+	}
+
+	var getRandomShowID = function getRandomShowID(query) {
+		return self.search(query).
+			pipe(function (data, status) {
+				return _.random(data.response.numFound) + 1;
+			}).
+			pipe(function (page) {
+				return self.search(query, page);
+			}).
+			pipe(function (data, status) {
+				return data.response.docs[0].identifier;
+			});
+	}
+
+	self.search = function (query, page) {
+		return $.ajax({
+			url : "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + (page || 1) + "&output=json", 
+			dataType : 'jsonp'
 		});
 	}
 
 	self.randomShowByCollection = function(collection) {
-		var query = "collection:" + collection;
-
-		var newHash = "#/archive/artist/" + collection;
-
-		if (window.location.hash != newHash && ('history' in window)) {
-			window.history.pushState(null, null, newHash);
-		}
-		
-		
-		randomShow(query);
+		return randomShow("collection:" + collection);
 	}
 
 	self.randomShowByTaper = function (taper) {
-		var query = 'collection:"etree" AND (taper:(' +  taper + "))";
-		randomShow(query);
+		randomShow('collection:"etree" AND (taper:(' +  taper + "))");
 	}
 
 	self.showByID = function(showID) {
