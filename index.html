@@ -49,7 +49,7 @@
 			
 			audioPlayer.setContainer("playlistContainer");
 			
-			
+
 			archiveLoader.getCollections()
 				.then(function (data, status) {
 					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
@@ -67,7 +67,7 @@
 				archiveLoader.randomShowByCollection(collection).
 					then(function (playlist) {
 						if (playlist.files.length > 0) {
-							showPlaylist(playlist.files);
+							showPlaylist(playlist);
 						}
 						else if (attempt < 10){
 							pickRandomShow(collection, (attempt || 0) + 1);
@@ -82,14 +82,12 @@
 			$("#artistSearchBox").keypress(function (event) {
 				if (event.which == 13) //Enter Key
 				{
-					archiveLoader.randomShowByCollection($("#artistSearchBox").val()).
-						then(showPlaylist);
+					pickRandomShow($("#artistSearchBox").val());
 				}
 			});
 			
 			$("#artistSearchBtn").click(function () { 
-				archiveLoader.randomShowByCollection($("#artistSearchBox").val()).
-					then(showPlaylist);
+				pickRandomShow($("#artistSearchBox").val());
 			});
 
 			$("#taperSearchBox").keypress(function (event) {

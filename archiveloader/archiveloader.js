@@ -101,7 +101,7 @@ var archiveLoader = new function () {
 				//For a given original, add the streams as a property and return the original
 				var getStreams = function (orig) {
 					orig.streams = _(files).filter(isStreamable(orig)); 
-					return obj; 
+					return orig; 
 				}
 
 
