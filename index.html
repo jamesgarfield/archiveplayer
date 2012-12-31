@@ -33,19 +33,23 @@
 	</script>
 
 	<script type="text/javascript">
+	//Refers to the template above (tplStreamSource) and indicates that variables are prefixed with "data", e.g data.url
 	_.templateSettings.variable = "data";
 
+	//Adds function _.propertySelect to the Underscore library
 	_.mixin({
 		propertySelect : 	(function (key) {
 								return function (obj) { return obj[key]; }
 							}),
 	});
 
+
 	(function ($){
 		$(document).ready(function (){
 			
 			audioPlayer.setContainer("playlistContainer");
-			//archiveLoader.initartistSearchBox("searchInput");
+			
+			
 			archiveLoader.getCollections()
 				.then(function (data, status) {
 					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
@@ -158,12 +162,11 @@
 	        <div>
 	        	<div class="ui-grid-a">
 					<div class="ui-block-a">
-						<h5 id="showTitle">
-				        </h5>
+						<h5 id="showTitle"></h5>
+						<p id="showTaper"></p>
 					</div>
 					<div class="ui-block-b">
-						<h6 id="showTaper">
-			        	</h6>
+						<h6 id="trackDescription"></h6>
 					</div>
 				</div>
 				<div data-role="controlgroup" data-type="horizontal" data-theme="c">
