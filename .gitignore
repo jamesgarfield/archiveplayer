@@ -1,6 +1,7 @@
 mongoose*
 *.old
 *.zip
+*.sublime*
 
 #################
 ## Eclipse
