@@ -7,6 +7,10 @@ var archiveLoader = new function () {
 	 * if a passed object (obj) has a property corresponding to 'name' that
 	 * has a value that is (or is in) 'value'
 	 *
+	 * e.g.
+	 *   var all = [{name : "James", age:30}, {name:"Ben", age:24}]
+	 *   var some = all.filter(propertyIs("age", 30));
+	 *   ==> [{name : "James", age:30}]
 	 * 
 	 * @param  {String} name  Property name to check
 	 * @param  {*|Array} value Value or array of values to look for
@@ -54,7 +58,7 @@ var archiveLoader = new function () {
 		
 		//Aysnc get the base data for the show and pipe the results to the playlist processor function
 		return getShowData(showID).
-			pipe(function (data, status) {
+			then(function translateIntoPlaylist(data, status) {
 				
 				//Initialize Objects
 				var defaultCreator = data.metadata.collection[0];
@@ -66,7 +70,7 @@ var archiveLoader = new function () {
 					//Key is the file name of this object
 					obj.key = key.split('/').pop();
 					//url is the streaming address for this file
-					obj.url = baseURL + key 
+					obj.url = baseURL + key;
 					//creator is the artist
 					obj.creator = obj.creator || defaultCreator;
 					//Title is the title of the song
@@ -120,7 +124,7 @@ var archiveLoader = new function () {
 				var playlist = {
 					title : ((data.metadata.title && data.metadata.title[0]) || "No Title"),	//Returned title, or "No Title" as a default
 					originalURL : "http://archive.org/details/" + showID,
-					taper : ((data.metadata.taper && data.metadata.taper[0]) || "None"), //Returned taper, or "None" as a default
+					taper : ((data.metadata.taper && data.metadata.taper[0]) || "None"), 		//Returned taper, or "None" as a default
 					files : audio
 				}
 				return playlist;
@@ -136,7 +140,7 @@ var archiveLoader = new function () {
 	 */
 	var randomShow = function (query) {
 		return getRandomShowID(query).
-			pipe(getShowPlaylist);
+			then(getShowPlaylist);
 	}
 
 	/**
@@ -147,13 +151,10 @@ var archiveLoader = new function () {
 	 */
 	var getRandomShowID = function getRandomShowID(query) {
 		return self.search(query).
-			pipe(function (data, status) {
-				return _.random(data.response.numFound) + 1;
+			then(function searchAgainForRandomPage(data, status) {
+				return self.search(query, _.random(data.response.numFound) + 1);
 			}).
-			pipe(function (page) {
-				return self.search(query, page);
-			}).
-			pipe(function (data, status) {
+			then(function getShowID(data, status) {
 				return data.response.docs[0].identifier;
 			});
 	}
@@ -191,6 +192,28 @@ var archiveLoader = new function () {
 	 */
 	self.randomShowByTaper = function (taper) {
 		return randomShow('collection:"etree" AND (taper:(' +  taper + "))");
+	}
+
+	/**
+	 * Do an advanced search on one or more fields
+	 * @param  {String} collection aka artist
+	 * @param  {String} taper   
+	 * @param  {String} year    
+	 * @param  {String} venue   
+	 * @return {getShowPlaylist}
+	 */
+	self.randomShowByAdvancedSearch = function (collection, taper, year, venue) {
+		var query = 'collection:' + (collection || '"etree"');
+		if (taper) {
+			query += " AND (taper:(" + taper + "))";
+		}
+		if (year) {
+			query += " AND year:" + year;
+		}
+		if (venue) {
+			query += " AND (venue:(" + venue + "))";
+		}
+		return randomShow(query);
 	}
 
 	self.showByID = function(showID) {

@@ -63,10 +63,18 @@
 				audioPlayer.loadPlaylist(playlist.files);
 			}
 
-			var pickRandomShow = function (collection, attempt) {
-				archiveLoader.randomShowByCollection(collection).
+
+
+			var pickRandomShow = function (searchFunc, attempt) {
+				$.mobile.loading('show', {
+					text : "Finding playlist...", 
+					textVisible : true,
+					theme : 'a'
+				});
+				searchFunc().
 					then(function (playlist) {
 						if (playlist.files.length > 0) {
+							$.mobile.loading('hide');
 							showPlaylist(playlist);
 						}
 						else if (attempt < 10){
@@ -82,25 +90,36 @@
 			$("#artistSearchBox").keypress(function (event) {
 				if (event.which == 13) //Enter Key
 				{
-					pickRandomShow($("#artistSearchBox").val());
+					var searchFunc = _.bind(archiveLoader.randomShowByCollection, archiveLoader, [$("#artistSearchBox").val()]);
+					pickRandomShow(searchFunc);
 				}
 			});
 			
 			$("#artistSearchBtn").click(function () { 
-				pickRandomShow($("#artistSearchBox").val());
+				var searchFunc = _.bind(archiveLoader.randomShowByCollection, archiveLoader, [$("#artistSearchBox").val()]);
+				pickRandomShow(searchFunc);
 			});
 
 			$("#taperSearchBox").keypress(function (event) {
 				if (event.which == 13) //Enter Key
 				{
-					archiveLoader.randomShowByTaper($("#taperSearchBox").val()).
-						then(showPlaylist);
+					var searchFunc = _.bind(archiveLoader.randomShowByTaper, archiveLoader, [$("#taperSearchBox").val()]);
+					pickRandomShow(searchFunc);
 				}
 			});
 			
 			$("#taperSearchBtn").click(function () { 
-				archiveLoader.randomShowByTaper($("#taperSearchBox").val()).
-					then(showPlaylist);
+				var searchFunc = _.bind(archiveLoader.randomShowByTaper, archiveLoader, [$("#taperSearchBox").val()]);
+				pickRandomShow(searchFunc);
+			});
+
+			$("#advSearchBtn").click(function () { 
+				var  collection = $("#advSearchArtist").val(), 
+					 taper = $("#advSearchTaper").val(), 
+					 year = $("#advSearchYear").val(), 
+					 venue = $("#advSearchVenue").val();
+				var searchFunc = _.bind(archiveLoader.randomShowByAdvancedSearch, archiveLoader, collection, taper, year, venue);
+				pickRandomShow(searchFunc);
 			});
 		})
 	})(jQuery);
@@ -113,39 +132,82 @@
 	<div data-role="page" id="search">
 	    <div data-role="content">
 	    	<div data-role="collapsible-set" data-content-theme="d">
-	            <div data-role="collapsible" data-collapsed="false">
-	                <h3>
-	                    Artist
-	                </h3>
-	                <div class="ui-grid-a">
-			            <div class="ui-block-a">
-			            	<div data-role="fieldcontain">
-					                <input name="" id="artistSearchBox" placeholder="Lotus" value="" type="search">
-					        </div>
-			            </div>
-			            <div class="ui-block-b">
-			        		<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left" value="Search">    	
-			            </div>
-			        </div>
+	            <div data-role="collapsible" data-collapsed="false"> <!-- Artist Search -->
+
+					<h3>
+						Artist
+					</h3>
+					<fieldset data-role="controlgroup" data-mini="true">
+						<label for="artistSearchBox">
+						</label>
+						<input name="artistSearchBox" id="artistSearchBox" placeholder="Lotus" value="" type="search">
+					</fieldset>
+					<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="Submit" data-mini="true">
+			        
 	            </div>
-	            <div data-role="collapsible" data-collapsed="true">
-	                <h3>
-	                    Taper
-	                </h3>
-	                <div class="ui-grid-a">
-			            <div class="ui-block-a">
-			            	<div data-role="fieldcontain">
-					                <input name="" id="taperSearchBox" placeholder="Scott Bernstein" value="" type="search">
-					        </div>
-			            </div>
-			            <div class="ui-block-b">
-			        		<input id="taperSearchBtn" type="submit" data-inline="true" data-theme="a" data-icon="search" data-iconpos="left"  value="Search">    	
-			            </div>
-			        </div>
-	            </div>
-	        </div>
-	    	
-	    </div>
+	            <div data-role="collapsible" data-collapsed="true"><!-- Taper Search -->
+
+					<h3>
+						Taper
+					</h3>
+					<fieldset data-role="controlgroup" data-mini="true">
+						<label for="artistSearchBox">
+						</label>
+						<input name="taperSearchBox" id="taperSearchBox" placeholder="" value="" type="search">
+					</fieldset>
+					<input id="taperSearchBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="Submit" data-mini="true">
+
+				</div>
+				<div data-role="collapsible" data-collapsed="true">
+					<h3>
+						Advanced
+					</h3>
+					<div class="ui-grid-a">
+						<div class="ui-block-a">
+							<div data-role="fieldcontain">
+								<fieldset data-role="controlgroup" data-mini="true">
+									<label for="advSearchArtist">
+										Artist
+									</label>
+									<input name="advSearchArtist" id="advSearchArtist" placeholder="" value="" type="search">
+								</fieldset>
+							</div>
+						</div>
+						<div class="ui-block-b">
+							<div data-role="fieldcontain">
+								<fieldset data-role="controlgroup" data-mini="true">
+									<label for="advSearchYear">
+										Year
+									</label>
+									<input name="advSearchYear" id="advSearchYear" placeholder="" value="" type="search">
+								</fieldset>
+							</div>
+						</div>
+						<div class="ui-block-a">
+							<div data-role="fieldcontain">
+								<fieldset data-role="controlgroup" data-mini="true">
+									<label for="advSearchTaper">
+										Taper
+									</label>
+									<input name="advSearchTaper" id="advSearchTaper" placeholder="" value="" type="search">
+								</fieldset>
+							</div>
+						</div>
+						<div class="ui-block-b">
+							<div data-role="fieldcontain">
+								<fieldset data-role="controlgroup" data-mini="true">
+									<label for="advSearchVenue">
+										Venue
+									</label>
+									<input name="advSearchVenue" id="advSearchVenue" placeholder="" value="" type="search">
+								</fieldset>
+							</div>
+						</div>
+					</div>
+					<input id="advSearchBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="Search" data-mini="true">
+				</div>
+			</div>
+		</div>
         <div data-role="footer" data-id="navbar">		
 			<div data-role="navbar">
 				<ul>
@@ -161,13 +223,13 @@
 	        	<div class="ui-grid-a">
 					<div class="ui-block-a">
 						<h5 id="showTitle"></h5>
-						<p id="showTaper"></p>
+						<p id="showTaper">
 					</div>
 					<div class="ui-block-b">
 						<h6 id="trackDescription"></h6>
 					</div>
 				</div>
-				<div data-role="controlgroup" data-type="horizontal" data-theme="c">
+				<div data-role="controlgroup" data-type="horizontal" data-theme="c" data-mini="true">
 					<a id="apCtrlPlay" data-role="button" href="#" style="background-image: url(audioplayer/images/play.png); background-repeat: no-repeat; background-position:50%;">
 						<br/>
 					</a>
@@ -183,21 +245,16 @@
 				</div>
 	        </div>
 	        <ul id="playlistContainer" data-role="listview" data-divider-theme="c" data-inset="true">
-	            <li data-theme="c">
-	                <a href="#page1" data-transition="slide">
-	                    Song1
-	                </a>
-	            </li>
 	        </ul>
 	    </div>
 	    <div data-role="footer" data-id="navbar">		
-				<div data-role="navbar">
-					<ul>
-						<li><a href="#search" data-iconpos="inline" data-icon="search">Search</a></li>
-						<li><a href="#" data-iconpos="inline" data-icon="grid">Playlist</a></li>
-					</ul>
-				</div><!-- /navbar -->
-			</div><!-- /footer -->
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#search" data-iconpos="inline" data-icon="search">Search</a></li>
+					<li><a href="#playlist" data-iconpos="inline" data-icon="grid" class="ui-btn-active">Playlist</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
 	</div>
 	
 </body>
