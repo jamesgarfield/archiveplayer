@@ -53,7 +53,8 @@
 			archiveLoader.getCollections()
 				.then(function (data, status) {
 					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
-					$("#artistSearchBox").autocomplete({source:collections});	
+					$("#artistSearchBox").autocomplete({source:collections});
+					$("#advSearchArtist").autocomplete({source:collections});
 				});
 
 			var showPlaylist = function (playlist) {
@@ -77,11 +78,12 @@
 							$.mobile.loading('hide');
 							showPlaylist(playlist);
 						}
-						else if (attempt < 10){
+						else if (attempt < 30){
 							pickRandomShow(collection, (attempt || 0) + 1);
 						}
 						else
 						{
+							$.mobile.loading('hide');
 							alert("Could Not Find a Show");
 						}
 					});
