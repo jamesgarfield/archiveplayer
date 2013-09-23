@@ -119,8 +119,10 @@
 				var  collection = $("#advSearchArtist").val(), 
 					 taper = $("#advSearchTaper").val(), 
 					 year = $("#advSearchYear").val(), 
-					 venue = $("#advSearchVenue").val();
-				var searchFunc = _.bind(archiveLoader.randomShowByAdvancedSearch, archiveLoader, collection, taper, year, venue);
+                     venue = $("#advSearchVenue").val(),
+                     avg_rating = $("#advSearchRating").val();
+
+				var searchFunc = _.bind(archiveLoader.randomShowByAdvancedSearch, archiveLoader, collection, taper, year, venue, avg_rating);
 				pickRandomShow(searchFunc);
 			});
 		})
@@ -195,13 +197,13 @@
 								</fieldset>
 							</div>
 						</div>
-						<div class="ui-block-b">
+						<div class="ui-block-a">
 							<div data-role="fieldcontain">
 								<fieldset data-role="controlgroup" data-mini="true">
-									<label for="advSearchVenue">
-										Venue
+									<label for="advSearchRating">
+									    Rating	
 									</label>
-									<input name="advSearchVenue" id="advSearchVenue" placeholder="" value="" type="search">
+									<input name="advSearchRating" id="advSearchRating" placeholder="" value="" type="search">
 								</fieldset>
 							</div>
 						</div>

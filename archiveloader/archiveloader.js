@@ -202,7 +202,7 @@ var archiveLoader = new function () {
 	 * @param  {String} venue   
 	 * @return {getShowPlaylist}
 	 */
-	self.randomShowByAdvancedSearch = function (collection, taper, year, venue) {
+	self.randomShowByAdvancedSearch = function (collection, taper, year, venue, avg_rating) {
 		var query = 'collection:' + (collection || '"etree"');
 		if (taper) {
 			query += " AND (taper:(" + taper + "))";
@@ -212,6 +212,9 @@ var archiveLoader = new function () {
 		}
 		if (venue) {
 			query += " AND (venue:(" + venue + "))";
+		}
+		if (avg_rating) {
+			query += " AND (avg_rating:[\"" + avg_rating + "\" TO \"5\"])";
 		}
 		return randomShow(query);
 	}
