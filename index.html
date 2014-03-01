@@ -58,6 +58,16 @@
 			
 			audioPlayer.setContainer("playlistContainer");
 			
+			function goingToTheShow(showID) {
+				var pplaylist = archiveLoader.showByID(showID)
+				pplaylist.then(showPlaylist)
+			}
+
+			var router = Router({
+				"archive/random/artist/:artistName" : archiveLoader.randomShowByCollection,
+				"archive/show/:showID" : goingToTheShow
+			});
+			router.init();
 
 			archiveLoader.getCollections()
 				.then(function (data, status) {
@@ -134,6 +144,10 @@
 				var searchFunc = _.bind(archiveLoader.randomShowByAdvancedSearch, archiveLoader, collection, taper, year, venue, avg_rating);
 				pickRandomShow(searchFunc);
 			});
+
+			//Fire the router in case we are going directly to a path
+			router.handler();
+
 		})
 	})(jQuery);
 	</script>
