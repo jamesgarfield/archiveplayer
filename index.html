@@ -77,10 +77,12 @@
 				});
 
 			var showPlaylist = function (playlist) {
+				playlist.route = window.location.hash;
 				$.mobile.changePage("#playlist");
-				$("#showTitle").html('<a href="' + playlist.originalURL +'" window="_blank">' + playlist.title +"</a>" );
-				$("#showTaper").html("Taper: " + playlist.taper);
+				$("#showTitle").html('<a href="' + playlist.route +'" window="_blank">' + playlist.title +"</a>" );
+				$("#originalSource").html('<a href="' + playlist.originalURL +'" window="_blank">Taped by ' + playlist.taper + " @ archive.org</a>" );
 				audioPlayer.loadPlaylist(playlist.files);
+				window.hash = playlist.route;
 			}
 
 
@@ -260,7 +262,7 @@
 	        	<div class="ui-grid-a">
 					<div class="ui-block-a">
 						<h5 id="showTitle"></h5>
-						<p id="showTaper">
+						<h6 id="originalSource"></h6>
 					</div>
 					<div class="ui-block-b">
 						<h6 id="trackDescription"></h6>
