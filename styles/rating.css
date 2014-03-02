@@ -1,0 +1,111 @@
+/* Based on http://jsfiddle.net/LTQrZ/20/ */
+
+section#rating {
+    padding-left: 50px; /* arbitrary, to expose the "zero stars" area half a star to the left of the first star.*/
+}
+
+.star-rating {
+    margin: 0 auto;
+    display:inline-block;
+}
+
+/* radio button stars */
+.rb0:checked ~ .rating,
+label.rb0l:hover ~ .rating
+{
+    width: 0px; /* no stars */
+} 
+
+.rb1:checked ~ .rating,
+label.rb1l:hover ~ .rating
+{
+    width: 16px; /* half a star */
+} 
+
+.rb2:checked ~ .rating,
+label.rb2l:hover ~ .rating
+{
+    width: 32px; /* a star */
+} 
+
+.rb3:checked ~ .rating,
+label.rb3l:hover ~ .rating
+{
+    width: 48px; /* 1.5 stars */
+}
+
+.rb4:checked ~ .rating,
+label.rb4l:hover ~ .rating
+{
+    width: 64px; /* 2 stars */
+}
+.rb5:checked ~ .rating,
+label.rb5l:hover ~ .rating
+{
+    width: 80px;
+}
+.rb6:checked ~ .rating,
+label.rb6l:hover ~ .rating
+{
+    width: 96px;
+}
+.rb7:checked ~ .rating,
+label.rb7l:hover ~ .rating
+{
+    width: 112px;
+}
+.rb8:checked ~ .rating,
+label.rb8l:hover ~ .rating
+{
+    width: 128px;
+}
+.rb9:checked ~ .rating,
+label.rb9l:hover ~ .rating
+{
+    width: 144px;
+}
+.rb10:checked ~ .rating,
+label.rb10l:hover ~ .rating
+{
+    width: 160px; /* 5 stars */
+}
+
+.star-rating label.star {
+    width: 16px; /* half star */
+    left: -16px; /* half star */
+    padding: 0;
+    height: 40px; /* whole star + 2x padding (4px each for top and bottom) */ 
+    position: relative;
+    z-index: 3;
+    float: left;
+}
+
+.star-rating label.star.last {
+    width: 32px;
+}
+
+/* hide inputs (RBs and their labels) */
+.star-rating input[type=radio],
+.star-rating label.rb
+{
+    display: none;
+}
+
+/* using icons found at http://www.easyicon.cn/language.en/icondetail/523835/ */
+.rating {
+    background: url(http://cdn-img.easyicon.cn/png/5238/523834.gif) repeat-x top left;
+    position: relative;
+    z-index: 2;
+    top: 4px; /* 1x padding */
+    height: 32px; /* whole star */
+    width:0px;
+}
+
+.rating-bg {
+    background: url(http://cdn-img.easyicon.cn/png/5238/523835.gif) repeat-x top left;
+    position: relative;
+    z-index: 1;
+    top: -28px; /* 1 whole star - 1x padding */
+    height: 32px; /* whole star */
+    width: 160px;
+}
