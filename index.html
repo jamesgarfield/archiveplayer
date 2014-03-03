@@ -78,12 +78,13 @@
 				});
 
 			var showPlaylist = function (playlist) {
-				playlist.route = window.location.hash;
+				var hashLocation = '#archive/show/' + playlist.id;
+				window.location.hash = hashLocation;
 				$.mobile.changePage("#playlist");
-				$("#showTitle").html('<a href="' + playlist.route +'" window="_blank">' + playlist.title +"</a>" );
+				$("#showTitle").html('<a href="' + hashLocation +'" window="_blank">' + playlist.title +"</a>" );
 				$("#originalSource").html('<a href="' + playlist.originalURL +'" window="_blank">Taped by ' + playlist.taper + " @ archive.org</a>" );
 				audioPlayer.loadPlaylist(playlist.files);
-				window.hash = playlist.route;
+
 			}
 
 
