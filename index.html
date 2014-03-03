@@ -78,6 +78,7 @@
 				});
 
 			var showPlaylist = function (playlist) {
+				var hashLocation = '#archive/show/' + playlist.id;
 				$.mobile.changePage("#playlist");
 				$("#showTitle").html('<a href="' + hashLocation +'" window="_blank">' + playlist.title +"</a>" );
 				$("#originalSource").html('<a href="' + playlist.originalURL +'" window="_blank">Taped by ' + playlist.taper + " @ archive.org</a>" );
