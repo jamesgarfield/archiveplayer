@@ -122,6 +122,7 @@ var archiveLoader = new function () {
 				
 				//Construct a playlist object to pass back
 				var playlist = {
+					id : showID,
 					title : ((data.metadata.title && data.metadata.title[0]) || "No Title"),	//Returned title, or "No Title" as a default
 					originalURL : "http://archive.org/details/" + showID,
 					taper : ((data.metadata.taper && data.metadata.taper[0]) || "None"), 		//Returned taper, or "None" as a default
