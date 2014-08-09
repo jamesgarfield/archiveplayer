@@ -26,9 +26,6 @@
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
 	
 	
-
-	
-
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
 			<span class="playlistEntryInfo"><%= data.creator %> - <%= data.title %></span>
@@ -43,118 +40,10 @@
 	</script>
 
 	<script type="text/javascript">
-	//Refers to the template above (tplStreamSource) and indicates that variables are prefixed with "data", e.g data.url
-	_.templateSettings.variable = "data";
-
-	//Adds function _.propertySelect to the Underscore library
-	_.mixin({
-		propertySelect : 	(function (key) {
-								return function (obj) { return obj[key]; }
-							}),
-	});
-
-
-	(function ($){
-		$(document).ready(function (){
-			
-			audioPlayer.setContainer("playlistContainer");
-			
-			function goingToTheShow(showID) {
-				var pplaylist = archiveLoader.showByID(showID)
-				pplaylist.then(showPlaylist)
-			}
-
-			var router = Router({
-				"archive/random/artist/:artistName" : archiveLoader.randomShowByCollection,
-				"archive/show/:showID" : goingToTheShow
-			});
-			router.init();
-
-			archiveLoader.getCollections()
-				.then(function (data, status) {
-					var collections = _(data.response.docs).map(function (c) {  return {label: c.title, value:c.identifier}  });
-					$("#artistSearchBox").autocomplete({source:collections});
-					$("#advSearchArtist").autocomplete({source:collections});
-				});
-
-			var showPlaylist = function (playlist) {
-				var hashLocation = '#archive/show/' + playlist.id;
-				$.mobile.changePage("#playlist");
-				$("#showTitle").html('<a href="' + hashLocation +'" window="_blank">' + playlist.title +"</a>" );
-				$("#originalSource").html('<a href="' + playlist.originalURL +'" window="_blank">Taped by ' + playlist.taper + " @ archive.org</a>" );
-				audioPlayer.loadPlaylist(playlist.files);
-			}
-
-
-
-			var pickRandomShow = function (searchFunc, attempt) {
-				$.mobile.loading('show', {
-					text : "Finding playlist...", 
-					textVisible : true,
-					theme : 'a'
-				});
-				searchFunc().
-					then(function (playlist) {
-						if (playlist.files.length > 0) {
-							$.mobile.loading('hide');
-							//showPlaylist(playlist);
-							var hashLocation = '#archive/show/' + playlist.id;
-							window.location.hash = hashLocation;
-						}
-						else if (attempt < 30){
-							pickRandomShow(collection, (attempt || 0) + 1);
-						}
-						else
-						{
-							$.mobile.loading('hide');
-							alert("Could Not Find a Show");
-						}
-					});
-			}
-
-			$("#artistSearchBox").keypress(function (event) {
-				if (event.which == 13) //Enter Key
-				{
-					var searchFunc = _.bind(archiveLoader.randomShowByCollection, archiveLoader, [$("#artistSearchBox").val()]);
-					pickRandomShow(searchFunc);
-				}
-			});
-			
-			$("#artistSearchBtn").click(function () { 
-				var searchFunc = _.bind(archiveLoader.randomShowByCollection, archiveLoader, [$("#artistSearchBox").val()]);
-				pickRandomShow(searchFunc);
-			});
-
-			$("#taperSearchBox").keypress(function (event) {
-				if (event.which == 13) //Enter Key
-				{
-					var searchFunc = _.bind(archiveLoader.randomShowByTaper, archiveLoader, [$("#taperSearchBox").val()]);
-					pickRandomShow(searchFunc);
-				}
-			});
-			
-			$("#taperSearchBtn").click(function () { 
-				var searchFunc = _.bind(archiveLoader.randomShowByTaper, archiveLoader, [$("#taperSearchBox").val()]);
-				pickRandomShow(searchFunc);
-			});
-
-			$("#advSearchBtn").click(function () { 
-				var  collection = $("#advSearchArtist").val(), 
-					 taper = $("#advSearchTaper").val(), 
-					 year = $("#advSearchYear").val(), 
-                     venue = $("#advSearchVenue").val(),
-                     avg_rating = $("#advSearchRating").val();
-
-				var searchFunc = _.bind(archiveLoader.randomShowByAdvancedSearch, archiveLoader, collection, taper, year, venue, avg_rating);
-				pickRandomShow(searchFunc);
-			});
-
-			//Fire the router in case we are going directly to a path
-			router.handler();
-
-		})
-	})(jQuery);
+		//Refers to the template above (tplStreamSource) and indicates that variables are prefixed with "data", e.g data.url
+		_.templateSettings.variable = "data";
 	</script>
+	<script type="text/javascript" src="index.js"></script>
 </head>
 
 
@@ -173,7 +62,8 @@
 						</label>
 						<input name="artistSearchBox" id="artistSearchBox" placeholder="Lotus" value="" type="search">
 					</fieldset>
-					<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="Submit" data-mini="true">
+					<input id="artistSearchBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="Random" data-mini="true">
+					<input id="artistListBtn" type="submit" data-inline="true" data-theme="b" data-icon="search" data-iconpos="left" value="List" data-mini="true">
 			        
 	            </div>
 	            <div data-role="collapsible" data-collapsed="true"><!-- Taper Search -->
@@ -257,6 +147,23 @@
 				</ul>
 			</div><!-- /navbar -->
 		</div><!-- /footer -->
+	</div>
+	<div data-role="page" id="results">
+		<div data-role="content">
+			<h3 id="resultTitle">Years</h3>
+			<ul id="resultList" data-role="listview" data-inset="true">
+
+			</ul>
+	    </div>
+	    <div data-role="footer" data-id="navbar">		
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#search" data-iconpos="inline" data-icon="search">Search</a></li>
+					<li><a href="#playlist" data-iconpos="inline" data-icon="grid" class="ui-btn-active">Playlist</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+		</div>
 	</div>
 	<div data-role="page" id="playlist">
 	    <div data-role="content">
