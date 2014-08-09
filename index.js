@@ -62,7 +62,7 @@ _.mixin({
 
 		var showPlaylist = function (playlist) {
 			$.mobile.changePage("#playlist");
-			var location = "?show=" + playlist.id + "&source=archive#results";
+			var location = "/?show=" + playlist.id + "&source=archive#results";
 			window.history.replaceState({}, "", location);
 			$("#showTitle").html('<a href="' + location +'" window="_blank">' + playlist.title +"</a>" );
 			$("#originalSource").html('<a href="' + playlist.originalURL +'" window="_blank">Taped by ' + playlist.taper + " @ archive.org</a>" );
@@ -82,7 +82,7 @@ _.mixin({
 					if (playlist.files.length > 0) {
 						$.mobile.loading('hide');
 						//showPlaylist(playlist);
-						var location = "?show=" + playlist.id + "&source=archive#results";
+						var location = "/?show=" + playlist.id + "&source=archive#results";
 						window.location.pushState({}, "", location);
 					}
 					else if (attempt < 30){
@@ -131,7 +131,7 @@ _.mixin({
 
 		function listArtistYearRange(artist, years) {
 			$.mobile.changePage("#results");
-			window.history.replaceState({}, "", "?artist=" + artist + "&find=range#results");
+			window.history.replaceState({}, "", "/?artist=" + artist + "&find=range#results");
 			$("#resultTitle")[0].innerText = [artist, "Years"].join(' ');
 			years.reverse();
 			var list = $("#resultList")[0];
@@ -139,7 +139,7 @@ _.mixin({
 			$(list).empty();
 			years.forEach(function (y) {
 				var li = document.createElement("li");
-				var html = '<a href="?artist=' + artist + "&year=" + y + '#results">' + y + "</a>";
+				var html = '<a href="/?artist=' + artist + "&year=" + y + '#results">' + y + "</a>";
 				li.innerHTML = html;
 				list.appendChild(li);
 			});
@@ -152,7 +152,7 @@ _.mixin({
 
 		function listArtistYear(artist, year, shows) {
 			$.mobile.changePage("#results");
-			window.history.replaceState({}, "", "?artist=" + artist + "&year=" + year + "#results");
+			window.history.replaceState({}, "", "/?artist=" + artist + "&year=" + year + "#results");
 			$("#resultTitle")[0].innerText = [artist, year].join(' - ');
 			var list = $("#resultList")[0];
 			$(list).off("click", "li");
@@ -160,7 +160,7 @@ _.mixin({
 
 			shows.forEach(function (s) {
 				var li = document.createElement("li");
-				var location = "?show=" + s.identifier + "&source=archive#results";
+				var location = "/?show=" + s.identifier + "&source=archive#results";
 				var title = s.avg_rating ? (s.title + ' (' + s.avg_rating + ')' ) : s.title;
 				li.innerHTML = '<a href="' + location + '">' + title + '</a>';
 				$(li).attr("data-showid", s.identifier);
