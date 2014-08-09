@@ -160,6 +160,33 @@ var archiveLoader = new function () {
 			});
 	}
 
+	self.getCollectionYearRange = function (collection) {
+		var startYear, endYear;
+		var query = "collection:" + collection + "&sort[]=date+asc&fl[]=date";
+		return self
+			.search(query)
+			.then(function (data, status) {
+				var d = new Date(data.response.docs[0].date);
+				startYear = d.getUTCFullYear();
+				return self.search(query, data.response.numFound);
+			})
+			.then(function (data, status) {
+				var d = new Date(data.response.docs[0].date);
+				endYear = d.getUTCFullYear();
+				return _.range(startYear, endYear+1);
+			});
+	}
+
+	self.getCollectionYear = function (collection, year) {
+
+		var query = "collection:" + collection + " AND date:[" + year + "-01-01 TO " + (parseInt(year, 10)+1) +"-01-01]&sort[]=date+asc&fl[]=identifier&fl[]=date&fl[]=creator&fl[]=title";
+		return self
+			.search(query, 1, 300)
+			.then(function(data, status) {
+				return data.response.docs;
+			});
+	}
+
 	/**
 	 * Given a archive.org REST query fragment, execute that query async and return a jQuery.Deferred promise
 	 * @async
@@ -167,9 +194,11 @@ var archiveLoader = new function () {
 	 * @param  {Number} [page]  Optional page number to return (default: 1)
 	 * @return {jQuery.Deferred}
 	 */
-	self.search = function (query, page) {
+	self.search = function (query, page, rows) {
+		page = page || 1;
+		rows = rows || 1;
 		return $.ajax({
-			url : "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=1&page=" + (page || 1) + "&output=json", 
+			url : "http://archive.org/advancedsearch.php?q=" + query + "&fl[]=identifier&rows=" + rows + "&page=" + page + "&output=json", 
 			dataType : 'jsonp'
 		});
 	}
@@ -235,4 +264,8 @@ var archiveLoader = new function () {
 			dataType : 'jsonp'
 		});
 	}
+
+
+
+
 };
