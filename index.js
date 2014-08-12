@@ -71,7 +71,7 @@ _.mixin({
 		function locationRouter() {
 			var location = window.location;
 			var search = location.search;
-
+			var page = location.hash;
 			if (!search) {
 				$.mobile.changePage("#search");
 				return;
@@ -82,7 +82,7 @@ _.mixin({
 				params[part[0]] = part[1];
 				return params;
 			}, {})
-			
+			baseRouter(params, page)
 		}
 
 		function popStateRouter(event) {
