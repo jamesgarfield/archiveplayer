@@ -28,7 +28,7 @@
 	
 	<script type="text/template" id="tplPlaylistRecord">
 		<li class="playlistEntry">
-			<span class="playlistEntryInfo"><%= data.creator %> - <%= data.title %></span>
+			<span class="playlistEntryInfo"><%= data.creator %> - <%= data.title %> <span style="float:right;">(<%= data.tracklength %>)</span> </span>
 			<audio preload="none">
 				<%= data.streams %>
 			</audio>

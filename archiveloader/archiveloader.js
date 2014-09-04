@@ -114,10 +114,30 @@ var archiveLoader = new function () {
 					return orig.streams.length > 0 
 				}
 
+				var setTrackLength = function(orig) {
+					orig.tracklength = getTimeSigniture(parseInt(orig.length, 10))
+					return orig;
+				}
+
+				/**
+				 * Turns seconds into a time signiture (mm:ss)
+				 * @param  {Number} seconds [description]
+				 * @return {String}
+				 */
+				var getTimeSigniture = function (seconds) {
+					var min = padder(parseInt(Math.floor(seconds/60), 10) || 0, 2);
+					var sec = padder(parseInt(seconds - (min * 60), 10) || 0, 2);
+					return [min, sec].join(":");
+					function padder(num, padding) {
+						return (new Array(padding-(num+'').length + 1)).join('0') + num;
+					}
+				}
+
 				var audio = _.chain(files)	//for each file in the show
 					.filter(isOriginal)		//filter down to just the original audio
 					.map(getStreams)		//Find and add any streams
 					.filter(hasStreams)		//filter down to only originals that have streamable content
+					.map(setTrackLength)	//set tracklength property
 					.value();				//Get the result
 				
 				//Construct a playlist object to pass back
